@@ -1,0 +1,25 @@
+
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Getting Started: Serving Web Content</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<thead>
+<tr>
+  <th>Nom</th>
+  <th>Email</th>
+  <th>Rôle</th><br/>
+</tr>
+</thead>
+<tr th:each="user : ${users}">
+  <td   style="height: 20px" th:text="${user.name}"></td>
+  <td  style="height: 20px " th:text="${user.email}"></td>
+  <td  style="height: 20px" th:text="${user.userType}"></td><br/>
+</tr>
+
+</body>
+</html>
+<tbody>

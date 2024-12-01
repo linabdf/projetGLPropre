@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+  <title>Tableau de Bord Membre de l'Équipe</title>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Tableau de Bord Membre de l'Équipe</h1>
+    <button id="logout">Se déconnecter</button>
+  </header>
+
+  <section id="taskOverview">
+    <h2>Aperçu des Tâches</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Tâche</th>
+        <th>Statut</th>
+        <th>Échéance</th>
+        <th>Priorité</th>
+      </tr>
+      </thead>
+      <tbody id="taskList">
+      <!-- Liste des tâches assignées -->
+      <tr>
+        <td>Tâche A</td>
+        <td>À faire</td>
+        <td>01/11/2023</td>
+        <td>Élevée</td>
+      </tr>
+      <tr>
+        <td>Tâche B</td>
+        <td>En cours</td>
+        <td>05/11/2023</td>
+        <td>Moyenne</td>
+      </tr>
+      <tr>
+        <td>Tâche C</td>
+        <td>Terminée</td>
+        <td>10/10/2023</td>
+        <td>Faible</td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="timeTracking">
+    <h2>Suivi du Temps</h2>
+    <div id="timeEntry">
+      <h3>Enregistrer le Temps</h3>
+      <label for="taskSelect">Sélectionner une Tâche:</label>
+      <select id="taskSelect">
+        <option value="Tâche A">Tâche A</option>
+        <option value="Tâche B">Tâche B</option>
+        <option value="Tâche C">Tâche C</option>
+      </select>
+      <label for="timeSpent">Temps Passé (heures):</label>
+      <input type="number" id="timeSpent" min="0" step="0.1" required>
+      <button id="submitTime">Enregistrer</button>
+    </div>
+    <h3>Temps Total Passé</h3>
+    <p id="totalTime">Total : 5 heures</p>
+  </section>
+
+  <section id="commentsCollaboration">
+    <h2>Commentaires et Collaboration</h2>
+    <div id="commentsSection">
+      <h3>Discussions sur les Tâches</h3>
+      <div class="comment">
+        <p><strong>Utilisateur 1 :</strong> J'ai besoin d'aide sur la Tâche A.</p>
+      </div>
+      <div class="comment">
+        <p><strong>Utilisateur 2 :</strong> La Tâche B est presque terminée !</p>
+      </div>
+      <textarea id="newComment" placeholder="Ajouter un commentaire..."></textarea>
+      <button id="submitComment">Envoyer</button>
+    </div>
+  </section>
+
+  <section id="notifications">
+    <h2>Notifications</h2>
+    <ul id="notificationList">
+      <li>Vous avez été assigné à la Tâche A.</li>
+      <li>La Tâche B a été modifiée.</li>
+      <li>Une nouvelle Tâche a été créée.</li>
+    </ul>
+  </section>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

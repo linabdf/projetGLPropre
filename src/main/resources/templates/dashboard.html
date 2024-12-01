@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+  <title>Tableau de Bord</title>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Tableau de Bord</h1>
+    <button id="logout">Se déconnecter</button>
+  </header>
+
+  <section id="projectOverview">
+    <h2>Projets en cours</h2>
+    <div class="project-list" id="projectList">
+      <!-- Les projets seront chargés ici -->
+    </div>
+  </section>
+
+  <section id="taskOverview">
+    <h2>Tâches à venir</h2>
+    <table id="taskTable">
+      <thead>
+      <tr>
+        <th>Tâche</th>
+        <th>Assignée à</th>
+        <th>Échéance</th>
+        <th>Statut</th>
+      </tr>
+      </thead>
+      <tbody id="taskBody">
+      <!-- Les tâches seront chargées ici -->
+      </tbody>
+    </table>
+  </section>
+
+  <section id="keyIndicators">
+    <h2>Indicateurs Clés</h2>
+    <div class="indicators">
+      <div class="indicator" id="projectProgress">
+        <h3>Progression des Projets</h3>
+        <p>75%</p>
+      </div>
+      <div class="indicator" id="pendingTasks">
+        <h3>Tâches en attente</h3>
+        <p>5</p>
+      </div>
+      <div class="indicator" id="recentActivity">
+        <h3>Activité récente</h3>
+        <p>Aucune activité récente</p>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="dashboard.js"></script>
+</body>
+</html>

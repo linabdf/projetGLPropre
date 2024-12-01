@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Tableau de Bord Administrateur</title>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Tableau de Bord Administrateur</h1>
+        <button id="logout">Se déconnecter</button>
+    </header>
+
+    <section id="projectOverview">
+        <h2>Aperçu des Projets</h2>
+        <div class="performance-indicators">
+            <h3>Indicateurs de Performance</h3>
+            <p>Taux d'achèvement : 75%</p>
+            <div id="performanceChart">
+                <!-- Graphiques ou visualisation ici -->
+                <canvas id="performanceCanvas"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section id="userManagement">
+        <h2>Gestion des Utilisateurs</h2>
+        <a href="/users">Voir tous les utilisateurs</a>
+        <table>
+
+            <tbody>
+            <tr th:if="${#lists.isEmpty(users)}">
+                <td colspan="3">Aucun utilisateur trouvé.</td>
+            </tr>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.userType}"></td>
+            </tr>
+            </tbody>
+
+
+        </table>
+        <button id="addUser">Ajouter un Utilisateur</button>
+
+
+
+    </section>
+
+
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

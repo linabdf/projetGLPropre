@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Ajouter un Projet</title>
+    <style>/* Général */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+}
+
+/* Titre principal */
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Formulaire */
+form {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+}
+
+form label {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+form input,
+form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+form button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* Lien "Retour au Tableau de Bord" */
+a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Section Gestion des Utilisateurs */
+#userManagement {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+}
+
+#userManagement h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#addUserSection h3 {
+    font-size: 1.25rem;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#addUserButton {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#addUserButton:hover {
+    background-color: #218838;
+}
+
+#dynamicFields {
+    margin-top: 20px;
+}
+
+.emailField {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.emailField input {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.removeEmailButton {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.removeEmailButton:hover {
+    background-color: #c82333;
+}
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center my-4">Ajouter un Nouveau Projet</h1>
+
+    <form action="/addProject" method="post">
+        <div class="form-group">
+            <label for="name">Nom du Projet :</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description :</label>
+            <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="startDate">Date de Début :</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="endDate">Date de Fin :</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="progres">Date de Fin :</label>
+            <input type="number" id="progres" name="progres"  min="0" max="100" value="0" class="form-control" required>
+        </div>
+
+        <h4>Gestion des Membres de l'Équipe</h4>
+
+
+        <button type="submit" class="btn btn-primary mt-4">Ajouter le Projet</button>
+    </form>
+
+    <a href="/dashboardManager" class="btn btn-link mt-4">Retour au Tableau de Bord</a>
+</div>
+
+
+
+</body>
+</html>

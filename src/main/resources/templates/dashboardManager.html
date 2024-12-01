@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    /* Corps de la page */
+ body {
+   background-color: #f4f7fc; /* Un gris plus clair pour un fond apaisant */
+   font-family: 'Arial', sans-serif; /* Police plus moderne */
+   color: #333; /* Texte plus sombre pour un meilleur contraste */
+   margin: 0;
+   padding: 0;
+ }
+
+ /* En-tête */
+ header {
+   background-color: #4e73df; /* Un bleu plus doux */
+   color: white;
+   padding: 20px 0;
+   text-align: center;
+   font-size: 2em;
+   font-weight: 600;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre subtile */
+ }
+
+ /* Sections */
+ section {
+   margin: 40px 0;
+   padding: 20px;
+   background-color: white;
+   border-radius: 8px;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Ombre légère */
+ }
+
+ /* Tableau des tâches */
+ table {
+   width: 100%;
+   border-collapse: separate;
+   border-spacing: 0 10px; /* Espace entre les lignes */
+   margin-top: 30px;
+ }
+
+ th, td {
+   border: 1px solid #ddd;
+   padding: 15px;
+   text-align: left;
+ }
+
+ th {
+   background-color: #4e73df; /* Bleu de l'en-tête */
+   color: white;
+   font-weight: 600;
+ }
+
+ td {
+   background-color: #f9f9f9;
+   font-size: 0.95em;
+   transition: background-color 0.3s ease;
+ }
+
+ tr:hover td {
+   background-color: #f1f1f1; /* Survol des lignes */
+ }
+
+ /* Boutons */
+ .btn-primary, .btn-danger {
+   padding: 8px 16px;
+   border-radius: 4px;
+   font-size: 0.9em;
+   transition: background-color 0.3s ease, transform 0.2s ease;
+ }
+
+ .btn-primary {
+   background-color: #4e73df;
+   border-color: #4e73df;
+ }
+
+ .btn-primary:hover {
+   background-color: #2e59d9;
+   transform: translateY(-2px); /* Effet de soulèvement */
+ }
+
+ .btn-danger {
+   background-color: #e74a3b;
+   border-color: #e74a3b;
+ }
+
+ .btn-danger:hover {
+   background-color: #d42c1f;
+   transform: translateY(-2px); /* Effet de soulèvement */
+ }
+
+ /* Champ de sélection et formulaires */
+ input, select, button {
+   padding: 10px;
+   font-size: 1em;
+   border-radius: 4px;
+   border: 1px solid #ccc;
+   transition: all 0.3s ease;
+ }
+
+ input:focus, select:focus, button:focus {
+   outline: none;
+   border-color: #4e73df;
+   box-shadow: 0 0 8px rgba(78, 115, 223, 0.5); /* Ombre bleue autour des champs */
+ }
+
+ input, select {
+   width: 100%;
+   margin-bottom: 15px;
+ }
+
+ /* Carte des projets */
+ .card {
+   border-radius: 8px;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+   transition: box-shadow 0.3s ease;
+   overflow: hidden;
+ }
+
+ .card:hover {
+   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Ombre au survol */
+ }
+
+ .project-card-body {
+   padding: 20px;
+ }
+
+ .project-title {
+   font-size: 1.2em;
+   font-weight: 600;
+   color: #333;
+ }
+
+ .project-description {
+   font-size: 1em;
+   color: #666;
+   margin-top: 10px;
+ }
+
+ /* Séparateur entre les projets */
+ .separator {
+   height: 1px;
+   background-color: #ddd;
+   margin: 20px 0;
+ }
+
+ /* Formulaire d'ajout de tâche */
+ #addTaskForm {
+   background-color: #f9f9f9;
+   border-radius: 8px;
+   padding: 20px;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+ }
+
+ #addTaskForm input, #addTaskForm select, #addTaskForm button {
+   width: 100%;
+   margin-bottom: 15px;
+ }
+
+ /* Section de l'aperçu des projets */
+ #projectOverview h2 {
+   font-size: 1.5em;
+   font-weight: 600;
+   color: #333;
+   margin-bottom: 20px;
+ }
+
+ /* Effect sur le bouton Ajouter des utilisateurs */
+ a.btn-primary {
+   background-color: #28a745;
+   border-color: #28a745;
+   font-size: 1em;
+   margin-top: 10px;
+   transition: background-color 0.3s ease, transform 0.2s ease;
+ }
+
+ a.btn-primary:hover {
+   background-color: #218838;
+   transform: translateY(-2px); /* Effet de soulèvement */
+ }
+    .project-row {
+  display: flex;
+  flex-direction: column; /* Dispose le contenu verticalement */
+  width: 100%; /* Prend toute la largeur */
+
+}
+
+.project-card {
+  width: 100%; /* Prend toute la largeur */
+}
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Tableau de Bord Chef de Projet</h1>
+  </header>
+
+  <section id="projectOverview">
+    <h2>Aperçu des Projets</h2>
+    <div th:if="${#lists.isEmpty(projects)}">
+      <p>Aucun projet trouvé pour cet utilisateur.</p>
+    </div>
+    <div class="row mt-4">
+      <!-- Boucle Thymeleaf pour afficher les projets -->
+      <div th:each="projet : ${projects}" class="project-row">
+        <div class="card project-card">
+          <div class="card-body project-card-body">
+            <!-- Affichage dynamique des informations du projet -->
+            <h5 class="project-title" th:text="${projet.name}">Nom du Projet</h5>
+            <p class="project-description" th:text="${projet.description}">Description du projet</p>
+            <p  th:text="${projet.id}">ID du projet:</span></p>
+            <p><strong>Début:</strong> <span th:text="${projet.startDate}">01/01/2024</span></p>
+            <p><strong>Fin:</strong> <span th:text="${projet.endDate}">31/12/2024</span></p>
+            <p><strong>Progress:</strong> <span th:text="${projet.progres}">0%</span></p>
+            <button th:data-projectname="${projet.name}"
+                    class="btn btn-primary"
+                    onclick="fetchDevelopers(this)">
+              Afficher les Développeurs
+            </button>
+            <div id="developer-list" style="display: none;" class="mt-3">
+              <!-- Liste des développeurs insérée ici dynamiquement -->
+            </div>
+            <button th:data-projectname="${projet.name}"
+                    class="btn btn-primary"
+                    onclick="fetchTasks(this)">
+              Afficher les taches
+            </button>
+            <div id="tasks-list" style="display: none;" class="mt-3">
+              <!-- Liste des développeurs insérée ici dynamiquement -->
+            </div>
+            <a href="/adduser"  th:href="@{/adduser/{name}(name=${projet.name})}"class="btn btn-primary">
+              Ajouter des utilisateurs
+            </a>
+
+          </div>
+        </div>
+        <!-- Séparateur pour diviser les projets -->
+        <div class="separator"></div>
+      </div>
+      <!-- Fin de la boucle Thymeleaf pour les projets -->
+    </div>
+    <a href="/project-management" class="btn btn-primary">Ajouter un Projet</a>
+  </section>
+
+  <!-- Section des tâches -->
+  <section id="taskSection">
+    <h3>Liste des tâches</h3>
+
+    <!-- Bouton pour ajouter une nouvelle tâche -->
+    <button id="addTaskButton" class="btn btn-primary mt-4">Ajouter une Tâche</button>
+
+    <!-- Formulaire d'ajout de tâche -->
+    <div id="addTaskForm" style="display: none; margin-top :20px;">
+      <h3>Ajouter une nouvelle tâche</h3>
+      <form  action="/addTask" method="post">
+        <label for="taskName">Nom de la tâche:</label>
+        <input type="text" id="taskName" name="taskName" required>
+        <br>
+        <label for="taskPriority">Priorité:</label>
+        <select id="taskPriority" name="taskPriority" required>
+          <option value="élevée">Élevée</option>
+          <option value="moyenne">Moyenne</option>
+          <option value="basse">Basse</option>
+        </select>
+        <br>
+        <label for="taskStatus">Etat:</label>
+        <select id="taskStatus" name="taskStatus" required>
+          <option value="unstarted">unstarted</option>
+          <option value="en_cours">En cours</option>
+          <option value="terminé">Terminé</option>
+        </select>
+        <br>
+
+
+        <label for="taskAdmin">Administrateur:</label>
+        <select id="taskAdmin" name="taskAdmin" required>
+          <!-- Liste dynamique des administrateurs qui sera remplie par JavaScript -->
+        </select>
+
+        <br>
+        <label for="taskProjet">Project</label><br>
+        <select id="taskProjet" name="taskProjet" required onchange="updateAdminList(this.value)">
+          <option value="" disabled selected>Choisir un projet</option>
+          <!-- Boucle Thymeleaf pour afficher les projets -->
+          <div th:each="projet : ${projects}">
+            <option th:value="${projet.name}" th:text="${projet.name}">Nom du projet</option>
+          </div>
+        </select>
+        <br>
+
+        <label for="taskDueDate">Échéance:</label>
+        <input type="date" id="taskDueDate" name="taskDueDate" class="form-control"  required>
+        <br>
+        <button type="submit" class="btn btn-primary mt-4">Ajouter</button>
+        <button type="button" onclick="cancelAddTask()">Annuler</button>
+      </form>
+      <div>
+        <p th:if="${message}" th:text="${message}" style="color:green;"></p>
+        <p th:if="${error}" th:text="${error}" style="color:red;"></p>
+      </div>
+    </div>
+
+    <!-- Tableau pour afficher les tâches -->
+    <table id="taskTable">
+      <thead>
+      <tr>
+        <th>Nom de la tâche</th>
+        <th>Priorité</th>
+        <th>Date d'échéance</th>
+        <th>Numéro utilisateur</th>
+        <th>Status</th>
+        <th>Numéro projet</th>
+
+      </tr>
+      </thead>
+      <tbody id="taskList">
+      <!-- Les tâches seront ajoutées ici -->
+      </tbody>
+    </table>
+  </section>
+  <button class="btn btn-warning mt-3" onclick="openDependencyModal('${projet.id}')">
+    Créer une Dépendance entre Tâches
+  </button>
+
+
+</div>
+
+<script>
+function fetchDevelopers(button) {
+const projectName = button.getAttribute('data-projectname');
+
+if (!projectName) {
+alert("Nom du projet introuvable !");
+return;
+}
+
+const url = `/projects/${projectName}/developers`;
+
+fetch(url)
+.then(response => {
+if (!response.ok) {
+throw new Error("Erreur lors de la récupération des développeurs.");
+}
+return response.json();
+})
+.then(developers => {
+console.log(`Développeurs pour le projet ${projectName}:`, developers);
+
+const developerList = document.getElementById("developer-list");
+console.log("Conteneur trouvé:", developerList);
+
+developerList.style.display = "block";
+developerList.innerHTML = ""; // Vide le conteneur avant de le remplir
+
+if (developers.length > 0) {
+
+developers.forEach(developer => {
+const devElement = document.createElement("p");
+devElement.textContent = developer;
+developerList.appendChild(devElement);
+});
+} else {
+developerList.textContent = "Aucun développeur trouvé pour ce projet.";
+}
+})
+.catch(error => {
+console.error("Erreur:", error);
+alert("Une erreur est survenue lors de la récupération des développeurs.");
+});
+}
+
+
+
+
+// Ajout de la fonctionnalité pour ajouter une tâche
+  document.getElementById('addTaskButton').addEventListener('click', function() {
+    document.getElementById('addTaskForm').style.display = 'block';
+    this.style.display = 'none';
+  });
+
+  function cancelAddTask() {
+    document.getElementById('addTaskForm').style.display = 'none';
+    document.getElementById('addTaskButton').style.display = 'block';
+  }
+
+  // Logique pour ajouter une tâche dynamique dans le tableau
+  document.getElementById('taskForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Récupération des données du formulaire
+    const taskName = document.getElementById('taskName').value;
+    const taskPriority = document.getElementById('taskPriority').value;
+    const taskDueDate = document.getElementById('taskDueDate').value;
+    const taskProjet = document.getElementById('taskProjet').value;
+    const taskAdmin = document.getElementById('taskAdmin').value;
+    const taskStatus = document.getElementById('taskStatus').value;
+    const daysLeft = calculateDaysLeft(taskDueDate);
+    const rowClass = daysLeft < 7 ? 'danger' : daysLeft < 30 ? 'warning' : '';
+
+    const row = document.createElement('tr');
+    row.className = rowClass;
+
+    row.innerHTML = `
+      <td>${taskName}</td>
+      <td>${taskPriority}</td>
+      <td>${taskDueDate}</td>
+      <td>${taskProjet}</td>
+
+
+
+<td>
+${taskAdmin}
+</td>
+ <select class="form-control" onchange="changeTaskStatus(this)">
+    <option value="No" ${taskStatus === 'unstarted' ? 'selected' : ''}>unstarted</option>
+    <option value="Admin2" ${taskStatus === 'En cours' ? 'selected' : ''}>En cours</option>
+    <option value="Admin3" ${taskStatus === 'Terminé' ? 'selected' : ''}>Terminé</option>
+  </select>
+</td>
+      <td>
+      <button onclick="editTask(this) class="btn btn-danger btn-sm">Éditer</button>
+        <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
+      </td>
+    `;
+    document.getElementById('taskList').appendChild(row);
+    cancelAddTask();
+  });
+// Fonction pour récupérer et remplir les administrateurs (ou développeurs) en fonction du projet
+function updateAdminList(projectName) {
+  const url = `/projects/${projectName}/developers`;  // L'URL pour récupérer les développeurs par projet
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des administrateurs.");
+      }
+      return response.json();
+    })
+    .then(developers => {
+      const taskAdminSelect = document.getElementById('taskAdmin');
+      taskAdminSelect.innerHTML = '';  // Vide la liste avant de la remplir
+
+      // Ajouter un élément par défaut "Choisir un administrateur"
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Choisir un administrateur';
+      taskAdminSelect.appendChild(defaultOption);
+
+      // Ajouter chaque développeur (ou administrateur) dans la liste des options
+      developers.forEach(developer => {
+        const option = document.createElement('option');
+        option.value = developer;  // Le nom du développeur (administrateur)
+        option.textContent = developer;  // Le nom à afficher dans la liste
+        taskAdminSelect.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error("Erreur:", error);
+      alert("Une erreur est survenue lors de la récupération des administrateurs.");
+    });
+}
+
+  function deleteTask(button) {
+    const row = button.closest('tr');
+    row.remove();
+  }
+
+  function calculateDaysLeft(dueDate) {
+    const currentDate = new Date();
+    const dueDateObj = new Date(dueDate);
+    const diffTime = dueDateObj - currentDate;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+   function changeTaskAdmin(select) {
+  const row = select.closest('tr');
+  const newAdmin = select.value;
+  // Mettre à jour la cellule d'administrateur directement si besoin
+  row.cells[4].querySelector('select').value = newAdmin;}
+function changeTaskStatus(select) {
+  const row = select.closest('tr');
+  const newAdmin = select.value;
+  // Mettre à jour la cellule d'administrateur directement si besoin
+  row.cells[5].querySelector('select').value = newAdmin;}
+function fetchTasks(projectName) {
+  const taskBody = document.getElementById(`task-body-${projectName}`);
+
+  // Envoi de la requête au backend
+  fetch(`/tasks?projectName=${encodeURIComponent(projectName)}`, {
+    method: 'GET',
+  })
+    .then((response) => response.json())
+    .then((tasks) => {
+      // Efface le contenu précédent
+      taskBody.innerHTML = '';
+
+      if (tasks.length > 0) {
+        // Ajoute les tâches dans le tableau
+        tasks.forEach((task) => {
+          const row = `
+            <tr>
+              <td>${task.name}</td>
+              <td>${task.priority}</td>
+              <td>${task.status}</td>
+              <td>${task.dueDate}</td>
+            </tr>
+          `;
+          taskBody.innerHTML += row;
+        });
+      } else {
+        // Affiche un message si aucune tâche n'est trouvée
+        taskBody.innerHTML = '<tr><td colspan="4">Aucune tâche trouvée</td></tr>';
+      }
+
+      // Affiche la zone des tâches
+      taskContainer.style.display = 'block';
+    })
+    .catch((error) => {
+      console.error('Erreur lors de la récupération des tâches :', error);
+    });
+}  const taskContainer = document.getElementById(`tasks-${projectName}`);
+
+function fetchTasks(button) {
+  const projectName = button.getAttribute("data-projectname");
+
+  const url = `/projects/${projectName}/tasks`;  // URL pour récupérer les tâches du projet
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des tâches.");
+      }
+      return response.json(); // Retourne les tâches en format JSON
+    })
+    .then(tasks => {
+      console.log("Réponse des tâches : ", tasks);
+    tasks.forEach((task, index) => {
+
+    console.log( task.nomT);
+    console.log(task.priorite);
+    console.log(task.dateEch);
+    console.log( task.status);
+    console.log( task.mail);
+    console.log( task.numP);
+
+});
+   const taskList = document.getElementById("taskList");
+
+if (tasks.length > 0) {
+    tasks.forEach(task => {
+        const row = document.createElement("tr");
+
+        // Créer les cellules pour chaque propriété de la tâche
+        const tdNomT = document.createElement("td");
+        tdNomT.textContent = task.nomT;
+
+        const tdPriorite = document.createElement("td");
+        tdPriorite.textContent = task.priorite;
+
+        const tdDateEch = document.createElement("td");
+        tdDateEch.textContent = task.dateEch;
+
+        const tdNumP = document.createElement("td");
+        tdNumP.textContent = task.nomP;
+        const tdNumU = document.createElement("td");
+        tdNumU.textContent = task.mail;
+
+        const tdStatus = document.createElement("td");
+        tdStatus.textContent = task.status;
+
+        const tdActions = document.createElement("td");
+        tdActions.innerHTML = `
+            <button onclick="editTask(this)" class="btn btn-danger btn-sm">Éditer</button>
+            <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
+        `;
+
+        // Ajouter toutes les cellules dans la ligne
+        row.appendChild(tdNomT);
+        row.appendChild(tdPriorite);
+        row.appendChild(tdDateEch);
+        row.appendChild(tdNumP);
+        row.appendChild(tdNumU);
+        row.appendChild(tdStatus);
+        row.appendChild(tdActions);
+
+        // Ajouter la ligne à la table
+        taskList.appendChild(row);
+    });
+} else {
+    taskList.innerHTML = "<tr><td colspan='8'>Aucune tâche trouvée.</td></tr>";
+}
+    })
+    .catch(error => {
+      console.error("Erreur:", error);
+      alert("Une erreur est survenue lors de la récupération des tâches.");
+    });
+}
+
+
+</script>
+</body>
+</html>

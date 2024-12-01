@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un Membre</title>
+    <!-- Inclusion de Bootstrap pour le style -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        /* Styles personnalisés */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #membersSection {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        #teamMembersList {
+            margin-top: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+            display: none; /* Cacher la liste initialement */
+        }
+
+        .memberItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .removeMemberButton {
+            font-size: 0.8rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Section pour ajouter les membres -->
+<div id="membersSection">
+    <h4 class="text-center mb-4">Ajouter un membre à l'équipe</h4>
+    <div class="form-group">
+        <label for="memberEmail">Adresse E-mail du Membre :</label>
+        <input type="email" id="memberEmail" class="form-control" placeholder="Entrez l'adresse e-mail" required>
+    </div>
+    <button type="button" class="btn btn-success btn-block" id="verifyButton">Vérifier l'Utilisateur</button>
+
+    <!-- Bouton de retour -->
+    <button type="button" class="btn btn-secondary btn-block mt-2" onclick="goBack()">Retour</button>
+</div>
+
+<!-- Section de la liste des membres, masquée par défaut -->
+<div id="teamMembersList" class="mt-3">
+    <h5 class="text-center">Liste des Membres</h5>
+    <div id="membersContainer">
+        <!-- Liste des membres ajoutés -->
+    </div>
+</div>
+
+<!-- Scripts JavaScript -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let currentProjectId = null; // Variable pour stocker l'ID du projet actuel
+
+    // Cette fonction doit être appelée lorsque vous cliquez sur un projet spécifique
+    function setCurrentProject(projectId) {
+        currentProjectId = projectId;
+        // Affichez la section pour ajouter des membres (si elle n'est pas déjà affichée)
+        document.getElementById('membersSection').style.display = 'block';
+    }
+
+    // Fonction pour envoyer la requête et vérifier si l'utilisateur existe
+    document.getElementById('verifyButton').addEventListener('click', function() {
+        const memberEmail = document.getElementById('memberEmail').value;
+
+        // Vérification du format de l'email
+        if (!memberEmail || !/\S+@\S+\.\S+/.test(memberEmail)) {
+            alert("Veuillez entrer une adresse e-mail valide.");
+            return;
+        }
+
+        // Envoi de l'email au backend via fetch
+        fetch('/adduser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded' // Utiliser ce type pour envoyer des paramètres URL-encodés
+            },
+            body: `email=${encodeURIComponent(memberEmail)}&projectId=${currentProjectId}` // Ajout du projectId
+        })
+        .then(response => response.json())  // Attendre la réponse JSON
+        .then(data => {
+            // Afficher le message de succès ou d'erreur
+            alert(data.message);
+
+            if (data.message === "Utilisateur ajouté.") {
+                // Si l'utilisateur est ajouté avec succès, créer un nouvel élément de membre
+                const newMember = document.createElement('div');
+                newMember.classList.add('memberItem');
+                newMember.innerHTML = `
+                    <span>${memberEmail}</span>
+                    <button type="button" class="btn btn-danger btn-sm removeMemberButton">Supprimer</button>
+                `;
+                document.getElementById('membersContainer').appendChild(newMember);
+                document.getElementById('teamMembersList').style.display = 'block';
+
+                // Ajouter l'événement de suppression
+                newMember.querySelector('.removeMemberButton').addEventListener('click', function() {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer ce membre ?')) {
+                        newMember.remove();
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            alert('Erreur de la requête: ' + error.message);
+        });
+    });
+
+    // Fonction pour retourner à la page précédente
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+</body>
+</html>
