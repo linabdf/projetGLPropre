@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.example.demo.DatabaseManager.isOnline;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class ProjectController {
 
     // ajouter un projet
     @PostMapping("/addProject")
-    public String registerProject(Project project, HttpSession session, Model model) {
+    public String registerProject(Project project, HttpSession session, Model model) throws SQLException {
         String userEmail = (String) session.getAttribute("userEmail");
         if (!isOnline()) {
             databaseManager.connexion();

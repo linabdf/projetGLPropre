@@ -4,6 +4,8 @@ package com.example.demo;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Tache")
@@ -28,6 +30,14 @@ public class Tache implements Serializable {
     @JoinColumn(name = "numP")
     private Project project;
 
+
+    @ManyToMany
+    @JoinTable(
+            name = "Tache_dependance",  // Nom de la table de jointure
+            joinColumns = @JoinColumn(name = "numT"),  // Colonne de jointure pour la tâche principale
+            inverseJoinColumns = @JoinColumn(name = "depT")  // Colonne de jointure pour la tâche dépendante
+    )
+    private List<Tache> dependances = new ArrayList<>();  // Liste des dépendances
 
     public Tache() {}
 
@@ -104,6 +114,19 @@ public class Tache implements Serializable {
 
     public String getDeveloppeur() {
         return developpeur.getId();
+    }
+    // Getter et setter pour les dépendances
+    public List<Tache> getDependances() {
+        return dependances;
+    }
+
+    public void setDependances(List<Tache> dependances) {
+        this.dependances = dependances;
+    }
+
+    // Méthode pour ajouter une dépendance
+    public void addDependance(Tache dependance) {
+        this.dependances.add(dependance);
     }
 
 

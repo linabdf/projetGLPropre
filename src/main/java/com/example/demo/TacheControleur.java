@@ -1,6 +1,7 @@
 package com.example.demo;
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,7 @@ public class TacheControleur {
                                  @RequestParam("taskStatus") String taskStatus,
                                  @RequestParam("taskProjet") String taskProjet,  // Récupérer l'ID du projet
                                  @RequestParam("taskAdmin") String taskAdmin // Récupérer l'ID du développeur
-                               ,HttpSession session, Model model){
+            ,HttpSession session, Model model){
         String userId = UserService.getUserIdByEmail(taskAdmin);
         String projectId= com.example.demo.ProjectService.getProjectIdByName( taskProjet);
 
@@ -69,7 +70,7 @@ public class TacheControleur {
 
         System.out.println("taskDueDate " + taskDueDate);
         System.out.println("taskPriority " + taskPriority);
-                System.out.println("taskStatus" + taskStatus);
+        System.out.println("taskStatus" + taskStatus);
         System.out.println("taskProjet " + taskProjet);  // Récupérer l'ID du projet
         System.out.println("taskAdmin"+taskAdmin);
 
@@ -98,9 +99,21 @@ public class TacheControleur {
         List<Map<String, String>> tasks= com.example.demo.TacheService. getTacheByProjectName(name);
 
 
-            return tasks;}
+        return tasks;}
 
 
-    }
 
+   @PostMapping("/add-dependency")
+   public ResponseEntity<String> addDependency(@RequestBody Map<String, String> request) {
+     //  String projectName = request.get("projectName");  // Récupérer le nom du projet
+       String taskName = request.get("taskName");  // Récupérer le nom de la tâche
+       String dependencyName = request.get("dependencyName");  // Récupérer le nom de la dépendance
 
+    //   System.out.println("Project: " + projectName);
+       System.out.println("Task: " + taskName);
+       System.out.println("Dependency: " + dependencyName);
+
+       return ResponseEntity.ok("Dépendance ajoutée avec succès");
+   }
+
+}

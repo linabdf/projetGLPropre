@@ -331,6 +331,10 @@
   <button class="btn btn-warning mt-3" onclick="openDependencyModal('${projet.id}')">
     Créer une Dépendance entre Tâches
   </button>
+  <button class="btn btn-warning mt-3" >
+    deconnecter
+  </button>
+
 
 
 </div>
@@ -576,6 +580,15 @@ if (tasks.length > 0) {
         const tdStatus = document.createElement("td");
         tdStatus.textContent = task.status;
 
+        const tdDependence = document.createElement("td");
+
+        // Formulaire avec champ de texte et bouton de soumission
+        tdDependence.innerHTML = `
+        <form onsubmit="addDependency(event, '${task.nomT}', this)">
+        <input type="text" id="dependencyName" placeholder="Nom d'une tâche dépendante" style="width: 100%;">
+        <button type="submit">Ajouter Dépendance</button>
+    </form>
+`;
         const tdActions = document.createElement("td");
         tdActions.innerHTML = `
             <button onclick="editTask(this)" class="btn btn-danger btn-sm">Éditer</button>
@@ -589,6 +602,7 @@ if (tasks.length > 0) {
         row.appendChild(tdNumP);
         row.appendChild(tdNumU);
         row.appendChild(tdStatus);
+        row.appendChild(tdDependence);
         row.appendChild(tdActions);
 
         // Ajouter la ligne à la table
@@ -603,6 +617,43 @@ if (tasks.length > 0) {
       alert("Une erreur est survenue lors de la récupération des tâches.");
     });
 }
+  function addDependency(event, taskName) {
+        event.preventDefault();  // Empêche la soumission classique du formulaire
+
+        // Récupérer la valeur de la dépendance entrée par l'utilisateur
+        const dependencyName = document.getElementById(`dependencyName`).value;
+
+        // Vérifier si un nom de dépendance a été fourni
+        if (!dependencyName) {
+            alert("Veuillez entrer un nom de tâche dépendante.");
+            return;
+        }
+
+        // Créer un objet de données à envoyer au backend
+        const data = {
+            taskName: taskName,  // Nom de la tâche
+            dependencyName: dependencyName // Nom de la dépendance
+        };
+        console.log(data);
+
+        // Utiliser Fetch API pour envoyer les données au backend
+        fetch('/add-dependency', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)  // Convertir l'objet en JSON
+        })
+        .then(response => response.text())  // Récupérer la réponse sous forme de texte
+        .then(data => {
+            console.log('Réponse du backend:', data); // Afficher la réponse du backend dans la console
+            alert('Dépendance ajoutée avec succès');  // Alerte avec un message de succès
+        })
+        .catch((error) => {
+            console.error('Erreur:', error); // Gérer les erreurs
+            alert("Une erreur est survenue.");
+        });
+    }
 
 
 </script>
