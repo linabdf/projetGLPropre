@@ -182,7 +182,6 @@ public class ProjectController {
             response.put("message", "L'email est manquant.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
         // Vérifier si le développeur existe
         String developpeurId = UserService.getDeveloppeurIdByEmail(email);
         System.out.println("Developpeur : " + developpeurId);

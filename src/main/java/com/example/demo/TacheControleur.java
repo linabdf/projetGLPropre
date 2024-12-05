@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -100,11 +101,8 @@ public class TacheControleur {
 
 
         return tasks;}
-
-
-
-   @PostMapping("/add-dependency")
-   public ResponseEntity<String> addDependency(@RequestBody Map<String, String> request) {
+    @PostMapping("/add-dependency")
+    public ResponseEntity<String> addDependency(@RequestBody Map<String, String> request) {
      //  String projectName = request.get("projectName");  // Récupérer le nom du projet
        String taskName = request.get("taskName");  // Récupérer le nom de la tâche
        String dependencyName = request.get("dependencyName");  // Récupérer le nom de la dépendance
@@ -112,8 +110,27 @@ public class TacheControleur {
     //   System.out.println("Project: " + projectName);
        System.out.println("Task: " + taskName);
        System.out.println("Dependency: " + dependencyName);
+       if (TacheService.verifierache(dependencyName)) {
+          Boolean insereTache= TacheService.inserDependancesTcahe(taskName,dependencyName);
+          if(insereTache) {
+              String tache = TacheService.getTacheid(taskName);
+              System.out.println(tache);
+          }       return ResponseEntity.ok("Dépendance ajoutée avec succès");
 
-       return ResponseEntity.ok("Dépendance ajoutée avec succès");
-   }
+   }else {
+           return ResponseEntity.ok("Dépendance  n'existe pas");
+       }
+    }
+    // Endpoint pour récupérer les tâches dépendantes d'une tâche donnée
+    // Endpoint pour récupérer les dépendances d'une tâche
+    @GetMapping("/tasks/{taskName}")
+    @ResponseBody
+    public List<String> getDependencies(@PathVariable String taskName) {
+        System.out.println("Tâche: " + taskName);
+        String idtach = TacheService.getTacheid(taskName);
+        List<String> dependencies = TacheService.getDependantesTache(idtach);
+        System.out.println("Dépendances: " + dependencies);
+        return dependencies; // Automatiquement converti en JSON
+    }
 
 }

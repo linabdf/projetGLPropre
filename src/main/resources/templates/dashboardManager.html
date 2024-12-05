@@ -276,8 +276,6 @@
         <label for="taskStatus">Etat:</label>
         <select id="taskStatus" name="taskStatus" required>
           <option value="unstarted">unstarted</option>
-          <option value="en_cours">En cours</option>
-          <option value="terminé">Terminé</option>
         </select>
         <br>
 
@@ -426,8 +424,6 @@ ${taskAdmin}
 </td>
  <select class="form-control" onchange="changeTaskStatus(this)">
     <option value="No" ${taskStatus === 'unstarted' ? 'selected' : ''}>unstarted</option>
-    <option value="Admin2" ${taskStatus === 'En cours' ? 'selected' : ''}>En cours</option>
-    <option value="Admin3" ${taskStatus === 'Terminé' ? 'selected' : ''}>Terminé</option>
   </select>
 </td>
       <td>
@@ -583,19 +579,21 @@ if (tasks.length > 0) {
         const tdDependence = document.createElement("td");
 
         // Formulaire avec champ de texte et bouton de soumission
-        tdDependence.innerHTML = `
-        <form onsubmit="addDependency(event, '${task.nomT}', this)">
-        <input type="text" id="dependencyName" placeholder="Nom d'une tâche dépendante" style="width: 100%;">
+       tdDependence.innerHTML = `
+    <button onclick="showDependencies('${task.nomT}')">Afficher Dépendances</button>
+    <form onsubmit="addDependency(event, '${task.nomT}', this)">
+        <input type="text" id="dependencyName-${task.nomT}" placeholder="Nom d'une tâche dépendante" style="width: 100%;" required>
         <button type="submit">Ajouter Dépendance</button>
     </form>
+    <ul id="dependencies-list-${task.nomT}" style="display:none;"></ul> <!-- Liste des dépendances -->
 `;
+
         const tdActions = document.createElement("td");
         tdActions.innerHTML = `
             <button onclick="editTask(this)" class="btn btn-danger btn-sm">Éditer</button>
             <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
         `;
-
-        // Ajouter toutes les cellules dans la ligne
+         // Ajouter toutes les cellules dans la ligne
         row.appendChild(tdNomT);
         row.appendChild(tdPriorite);
         row.appendChild(tdDateEch);
@@ -617,44 +615,77 @@ if (tasks.length > 0) {
       alert("Une erreur est survenue lors de la récupération des tâches.");
     });
 }
-  function addDependency(event, taskName) {
-        event.preventDefault();  // Empêche la soumission classique du formulaire
+function addDependency(event, taskName, form) {
+    event.preventDefault(); // Empêche la soumission classique
 
-        // Récupérer la valeur de la dépendance entrée par l'utilisateur
-        const dependencyName = document.getElementById(`dependencyName`).value;
+    // Récupère la valeur du champ de saisie associé au formulaire
+    const dependencyInput = form.querySelector('input[type="text"]');
+    const dependencyName = dependencyInput.value;
 
-        // Vérifier si un nom de dépendance a été fourni
-        if (!dependencyName) {
-            alert("Veuillez entrer un nom de tâche dépendante.");
-            return;
-        }
-
-        // Créer un objet de données à envoyer au backend
-        const data = {
-            taskName: taskName,  // Nom de la tâche
-            dependencyName: dependencyName // Nom de la dépendance
-        };
-        console.log(data);
-
-        // Utiliser Fetch API pour envoyer les données au backend
-        fetch('/add-dependency', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)  // Convertir l'objet en JSON
-        })
-        .then(response => response.text())  // Récupérer la réponse sous forme de texte
-        .then(data => {
-            console.log('Réponse du backend:', data); // Afficher la réponse du backend dans la console
-            alert('Dépendance ajoutée avec succès');  // Alerte avec un message de succès
-        })
-        .catch((error) => {
-            console.error('Erreur:', error); // Gérer les erreurs
-            alert("Une erreur est survenue.");
-        });
+    // Vérifie si une valeur a été entrée
+    if (!dependencyName) {
+        alert("Veuillez entrer un nom de tâche dépendante.");
+        return;
     }
 
+    // Créer un objet avec les données
+    const data = {
+        taskName: taskName, // Tâche cible
+        dependencyName: dependencyName // Dépendance saisie
+    };
+
+    // Envoie des données au backend
+    fetch('/add-dependency', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log('Réponse du backend:', data);
+        alert(`Dépendance ajoutée à ${taskName}`);
+
+        // Efface le champ de saisie après soumission
+        dependencyInput.value = '';
+    })
+    .catch((error) => {
+        console.error('Erreur:', error);
+        alert("Une erreur est survenue.");
+    });
+}
+function showDependencies(taskName) {
+    const url = `/tasks/${taskName}`;
+    const dependenciesList = document.getElementById(`dependencies-list-${taskName}`);
+
+    dependenciesList.style.display = "block";
+    dependenciesList.innerHTML = "Chargement...";
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erreur lors de la récupération des dépendances.");
+            }
+            return response.json();
+        })
+        .then(dependencies => {
+            dependenciesList.innerHTML = ""; // Nettoyer avant de remplir
+            if (dependencies.length > 0) {
+                dependencies.forEach(dep => {
+                    const li = document.createElement("li");
+                    li.textContent = dep;
+                    dependenciesList.appendChild(li);
+                });
+            } else {
+                dependenciesList.textContent = "Aucune dépendance trouvée.";
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            dependenciesList.textContent = "Erreur lors du chargement.";
+        });
+}
 
 </script>
 </body>
