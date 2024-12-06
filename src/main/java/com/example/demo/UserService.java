@@ -44,6 +44,32 @@ public class UserService {
     }
 
 
+    public String getRole(String email) {
+
+        // Requête SELECT pour récupérer les utilisateurs
+        String selectQuery = "SELECT role FROM Utilisateur WHERE mail = ?";
+        String role = "";
+
+        // Afficher les données après insertion
+        try (PreparedStatement stmtSelect = connection.prepareStatement(selectQuery)) {
+
+            stmtSelect.setString(1, email);
+
+            ResultSet rs = stmtSelect.executeQuery();
+
+            // Parcours des résultats et affichage
+            System.out.println("Liste des utilisateurs :");
+            while (rs.next()) {
+                role = rs.getString("role");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return role;
+    }
+
+
     // Méthode pour obtenir le dernier ID utilisé et générer le suivant
     public static String generateNextId(Connection conn) {
         String newId = "U001"; // Valeur par défaut si la table est vide

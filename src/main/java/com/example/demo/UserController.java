@@ -78,26 +78,35 @@ public class UserController {
             if(UserService.connectionutilisateur(user.getEmail(), user.getPassword())) { // si le compte existe
 
                 String role = UserService.getUser(user.getEmail(), user.getPassword());
+
                 session.setAttribute("userEmail", user.getEmail());
+
                 String userId = UserService.getUserIdByEmail(user.getEmail());
+                System.out.println("idUtilisateur"+userId);
                 if (userId != null) {
+                    switch(role){
+                        case "user" :
+                            List<Project> userProject =ProjectService.getProjectsByDeveloperId(userId);
+                            System.out.println("projets"+userProject);
+                            model.addAttribute("projects", userProject);
+                            return "dashboarduser";
+                        case "admin" :
+                            return "dashboardAdmin";
+                        case "manager" :
+                            List<Project> userProjects = ProjectService.getProjectByUserId(userId);
+                            System.out.println("projets"+userProjects);
+                            model.addAttribute("projects", userProjects); // Ajouter les projets au modèle
+                            return "dashboardManager";
+                        default:
+                            model.addAttribute("error", "Rôle inconnu !");
+                            return "index"; }
                     // Récupérer les projets associés à cet utilisateur
-                   List<Project> userProjects = ProjectService.getProjectByUserId(userId);
-                    model.addAttribute("projects", userProjects); // Ajouter les projets au modèle
+
                 } else {
                     model.addAttribute("errorMessage", "Utilisateur non trouvé.");
                     return "index"; // Redirige vers l'accueil si l'ID utilisateur est invalide
                 }
-                switch(role){
-                    case "user" :
-                        return "dashboarduser";
-                    case "admin" :
-                        return "dashboardAdmin";
-                    case "manager" :
-                        return "dashboardManager";
-                    default:
-                        model.addAttribute("error", "Rôle inconnu !");
-                        return "index"; }
+
 
 
             }

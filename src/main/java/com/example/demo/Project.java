@@ -45,7 +45,9 @@ public class Project  implements Serializable {
         this.user=user;
     }
 
+    public Project() {
 
+    }
 
 
     // Getters et setters

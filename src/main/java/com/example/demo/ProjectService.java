@@ -111,6 +111,30 @@ public class ProjectService {
 
 
     }
+    public static List<Project> getProjectsByDeveloperId(String developerId) {
+        // Cette méthode interroge la base de données pour récupérer les projets associés à un développeur
+        String query = "SELECT nomP FROM Projet p " +
+                "JOIN project_developpeur d ON d.numP = p.numP " +
+                "WHERE d.numU = ?"; // Correction : d.numP => d.numD (si developerId correspond à numD)
+        List<Project> projects = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, developerId); // Assignation de l'ID du développeur à la requête
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Project project = new Project(); // Créer un objet Project pour chaque ligne
+                project.setName(rs.getString("nomP")); // Récupérer le nom du projet depuis le résultat
+                projects.add(project);// Ajouter l'objet à la liste
+
+            }
+            System.out.println("projects"+projects);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Afficher les erreurs éventuelles
+        }
+
+        return projects; // Retourner la liste des projets
+    }
     public static String getProjectIdByName(String projectName) {
         String projectId = null;
         String query = "SELECT numP FROM Projet WHERE nomP = ?"; // Recherche par nom de projet
