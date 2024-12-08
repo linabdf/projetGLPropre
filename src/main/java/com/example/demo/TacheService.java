@@ -208,6 +208,158 @@ public List<String> getDependantesTache(String tacheid) {
 
     return dependantes;
 }
+    public static List<Map<String, String>> getTacheByProjectdeveloppeur(String numU) {
+        List<Tache> taches = new ArrayList<>();
+        List<Map<String, String>> resultList = new ArrayList<>();
+        String query = "SELECT nomT, dateEch, priorite, status ,p.nomP " +
+                "FROM Tache t " +
+                "JOIN Utilisateur u ON u.numU = t.numU " +
+                "JOIN Projet p ON p.numP = t.numP " +
+                "WHERE u.numU = ?";
+        System.out.println("Fetching tasks for project: " + numU);
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1,numU);  // Remplir le paramètre avec le nom du projet
+            ResultSet resultSet = stmt.executeQuery();
+
+
+            while (resultSet.next()) {
+                // Récupérer les valeurs directement
+                String nomT = resultSet.getString("nomT");
+                String priorite = resultSet.getString("priorite");
+                String status = resultSet.getString("status");
+                String dateEch = String.valueOf(resultSet.getDate("dateEch"));
+                String nomP = resultSet.getString("nomP");
+
+
+                // Stocker les résultats dans une Map pour chaque ligne
+                Map<String, String> row = new HashMap<>();
+                row.put("nomT", nomT);
+                row.put("priorite", priorite);
+                row.put("status", status);
+                row.put("dateEch", dateEch);
+                row.put("nomP", nomP);
+
+
+                // Ajouter la ligne dans la liste des résultats
+                resultList.add(row);
+
+                // Afficher ou manipuler directement les données
+                System.out.println(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Ajoutez plus de gestion des erreurs si nécessaire
+            throw new RuntimeException("Erreur lors de la récupération des tâches", e);
+        }
+        return resultList;
+    }
+    /*
+    public boolean verifierEtModifierStatut(String tacheName, String nouveauStatut) {
+        // Vérification de l'existence de la tâche et du statut actuel
+        String querySelect = "SELECT status FROM Tache WHERE nomT = ?";
+
+        try (PreparedStatement stmtSelect = connection.prepareStatement(querySelect)) {
+            stmtSelect.setString(1, tacheName); // Remplir le paramètre `nomT`
+
+            try (ResultSet rs = stmtSelect.executeQuery()) {
+                if (rs.next()) {
+                    // Récupération du statut actuel
+                    String statusActuel = rs.getString("status");
+
+                    // Si le statut actuel est 'unstarted' et le nouveau statut est 'begin'
+                    if( ("unstarted".equals(statusActuel) && "begin".equals(nouveauStatut))||("begin".equals(statusActuel) && "finished".equals(nouveauStatut))) {
+                        // Mise à jour du statut
+                        String queryUpdate = "UPDATE Tache SET status = ? WHERE nomT = ?";
+
+                        try (PreparedStatement stmtUpdate = connection.prepareStatement(queryUpdate)) {
+                            stmtUpdate.setString(1, nouveauStatut); // Remplir le nouveau statut
+                            stmtUpdate.setString(2, tacheName); // Remplir le nom de la tâche
+
+                            int rowsUpdated = stmtUpdate.executeUpdate();
+
+                            // Si la mise à jour a réussi, on retourne true
+                            return rowsUpdated > 0;
+                        }
+                    } else {
+                        // Si les conditions ne sont pas remplies, on ne fait rien
+                        return false;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la vérification ou de la mise à jour de la tâche", e);
+        }
+        return false; // Retourne false si la tâche n'existe pas ou si le statut n'est pas 'unstarted'
+    }
+*/
+    public boolean verifierEtModifierStatut(String tacheName, String nouveauStatut) {
+        // Vérification de l'existence de la tâche et du statut actuel
+        String querySelect = "SELECT status, numT FROM Tache WHERE nomT = ?";  // Ajout de numT pour utiliser dans la vérification des dépendances
+
+        try (PreparedStatement stmtSelect = connection.prepareStatement(querySelect)) {
+            stmtSelect.setString(1, tacheName); // Remplir le paramètre `nomT`
+
+            try (ResultSet rs = stmtSelect.executeQuery()) {
+                if (rs.next()) {
+                    // Récupération du statut actuel et du numT de la tâche principale
+                    String statusActuel = rs.getString("status");
+                    String numT = rs.getString("numT");  // Récupère le numT de la tâche principale
+
+                    // Vérification des dépendances de la tâche
+                    String querySelectDependances =
+                            "SELECT t.status FROM Tache t " +
+                                    "JOIN Tache_dependance d ON t.numT = d.depT " + // Jointure pour récupérer les tâches dépendantes
+                                    "WHERE d.numT = ?"; // On sélectionne toutes les tâches dépendantes pour numT (notre tâche principale)
+
+                    try (PreparedStatement stmtSelectDependances = connection.prepareStatement(querySelectDependances)) {
+                        stmtSelectDependances.setString(1, numT); // Utiliser numT ici pour récupérer les dépendances de la tâche principale
+
+                        try (ResultSet rsDependances = stmtSelectDependances.executeQuery()) {
+                            boolean dependancesFinies = true;
+
+                            // Vérification que toutes les tâches dépendantes sont "finished"
+                            while (rsDependances.next()) {
+                                String statusDependant = rsDependances.getString("status");
+                                System.out.println("Status de la dépendance : " + statusDependant);  // Affichage pour débogage
+
+                                // Si une dépendance n'est pas "finished", on marque dependancesFinies comme false
+                                if (!"finished".equals(statusDependant)) {
+                                    dependancesFinies = false;
+                                    break; // Dès qu'une dépendance n'est pas terminée, on arrête la vérification
+                                }
+                            }
+
+                            // Si toutes les dépendances sont "finished" et que le statut actuel est valide
+                            if (dependancesFinies &&
+                                    (("unstarted".equals(statusActuel) && "begin".equals(nouveauStatut)) ||
+                                            ("begin".equals(statusActuel) && "finished".equals(nouveauStatut)))) {
+
+                                // Mise à jour du statut
+                                String queryUpdate = "UPDATE Tache SET status = ? WHERE nomT = ?";
+
+                                try (PreparedStatement stmtUpdate = connection.prepareStatement(queryUpdate)) {
+                                    stmtUpdate.setString(1, nouveauStatut); // Remplir le nouveau statut
+                                    stmtUpdate.setString(2, tacheName); // Remplir le nom de la tâche
+
+                                    int rowsUpdated = stmtUpdate.executeUpdate();
+
+                                    // Si la mise à jour a réussi, on retourne true
+                                    return rowsUpdated > 0;
+                                }
+                            } else {
+                                // Si les conditions ne sont pas remplies (par exemple, une dépendance n'est pas terminée)
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la vérification ou de la mise à jour de la tâche", e);
+        }
+        return false; // Retourne false si la tâche n'existe pas ou si les dépendances ne sont pas toutes "finished"
+    }
 
  /*
 public List<String> getDependantesTache(String tacheid) {

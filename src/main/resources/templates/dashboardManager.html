@@ -338,354 +338,354 @@
 </div>
 
 <script>
-function fetchDevelopers(button) {
-const projectName = button.getAttribute('data-projectname');
+  function fetchDevelopers(button) {
+  const projectName = button.getAttribute('data-projectname');
 
-if (!projectName) {
-alert("Nom du projet introuvable !");
-return;
-}
-
-const url = `/projects/${projectName}/developers`;
-
-fetch(url)
-.then(response => {
-if (!response.ok) {
-throw new Error("Erreur lors de la récupération des développeurs.");
-}
-return response.json();
-})
-.then(developers => {
-console.log(`Développeurs pour le projet ${projectName}:`, developers);
-
-const developerList = document.getElementById("developer-list");
-console.log("Conteneur trouvé:", developerList);
-
-developerList.style.display = "block";
-developerList.innerHTML = ""; // Vide le conteneur avant de le remplir
-
-if (developers.length > 0) {
-
-developers.forEach(developer => {
-const devElement = document.createElement("p");
-devElement.textContent = developer;
-developerList.appendChild(devElement);
-});
-} else {
-developerList.textContent = "Aucun développeur trouvé pour ce projet.";
-}
-})
-.catch(error => {
-console.error("Erreur:", error);
-alert("Une erreur est survenue lors de la récupération des développeurs.");
-});
-}
-
-
-
-
-// Ajout de la fonctionnalité pour ajouter une tâche
-  document.getElementById('addTaskButton').addEventListener('click', function() {
-    document.getElementById('addTaskForm').style.display = 'block';
-    this.style.display = 'none';
-  });
-
-  function cancelAddTask() {
-    document.getElementById('addTaskForm').style.display = 'none';
-    document.getElementById('addTaskButton').style.display = 'block';
+  if (!projectName) {
+  alert("Nom du projet introuvable !");
+  return;
   }
 
-  // Logique pour ajouter une tâche dynamique dans le tableau
-  document.getElementById('taskForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    // Récupération des données du formulaire
-    const taskName = document.getElementById('taskName').value;
-    const taskPriority = document.getElementById('taskPriority').value;
-    const taskDueDate = document.getElementById('taskDueDate').value;
-    const taskProjet = document.getElementById('taskProjet').value;
-    const taskAdmin = document.getElementById('taskAdmin').value;
-    const taskStatus = document.getElementById('taskStatus').value;
-    const daysLeft = calculateDaysLeft(taskDueDate);
-    const rowClass = daysLeft < 7 ? 'danger' : daysLeft < 30 ? 'warning' : '';
-
-    const row = document.createElement('tr');
-    row.className = rowClass;
-
-    row.innerHTML = `
-      <td>${taskName}</td>
-      <td>${taskPriority}</td>
-      <td>${taskDueDate}</td>
-      <td>${taskProjet}</td>
-
-
-
-<td>
-${taskAdmin}
-</td>
- <select class="form-control" onchange="changeTaskStatus(this)">
-    <option value="No" ${taskStatus === 'unstarted' ? 'selected' : ''}>unstarted</option>
-  </select>
-</td>
-      <td>
-      <button onclick="editTask(this) class="btn btn-danger btn-sm">Éditer</button>
-        <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
-      </td>
-    `;
-    document.getElementById('taskList').appendChild(row);
-    cancelAddTask();
-  });
-// Fonction pour récupérer et remplir les administrateurs (ou développeurs) en fonction du projet
-function updateAdminList(projectName) {
-  const url = `/projects/${projectName}/developers`;  // L'URL pour récupérer les développeurs par projet
+  const url = `/projects/${projectName}/developers`;
 
   fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des administrateurs.");
-      }
-      return response.json();
-    })
-    .then(developers => {
-      const taskAdminSelect = document.getElementById('taskAdmin');
-      taskAdminSelect.innerHTML = '';  // Vide la liste avant de la remplir
-
-      // Ajouter un élément par défaut "Choisir un administrateur"
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Choisir un administrateur';
-      taskAdminSelect.appendChild(defaultOption);
-
-      // Ajouter chaque développeur (ou administrateur) dans la liste des options
-      developers.forEach(developer => {
-        const option = document.createElement('option');
-        option.value = developer;  // Le nom du développeur (administrateur)
-        option.textContent = developer;  // Le nom à afficher dans la liste
-        taskAdminSelect.appendChild(option);
-      });
-    })
-    .catch(error => {
-      console.error("Erreur:", error);
-      alert("Une erreur est survenue lors de la récupération des administrateurs.");
-    });
-}
-
-  function deleteTask(button) {
-    const row = button.closest('tr');
-    row.remove();
+  .then(response => {
+  if (!response.ok) {
+  throw new Error("Erreur lors de la récupération des développeurs.");
   }
-
-  function calculateDaysLeft(dueDate) {
-    const currentDate = new Date();
-    const dueDateObj = new Date(dueDate);
-    const diffTime = dueDateObj - currentDate;
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
-   function changeTaskAdmin(select) {
-  const row = select.closest('tr');
-  const newAdmin = select.value;
-  // Mettre à jour la cellule d'administrateur directement si besoin
-  row.cells[4].querySelector('select').value = newAdmin;}
-function changeTaskStatus(select) {
-  const row = select.closest('tr');
-  const newAdmin = select.value;
-  // Mettre à jour la cellule d'administrateur directement si besoin
-  row.cells[5].querySelector('select').value = newAdmin;}
-function fetchTasks(projectName) {
-  const taskBody = document.getElementById(`task-body-${projectName}`);
-
-  // Envoi de la requête au backend
-  fetch(`/tasks?projectName=${encodeURIComponent(projectName)}`, {
-    method: 'GET',
+  return response.json();
   })
-    .then((response) => response.json())
-    .then((tasks) => {
-      // Efface le contenu précédent
-      taskBody.innerHTML = '';
+  .then(developers => {
+  console.log(`Développeurs pour le projet ${projectName}:`, developers);
 
-      if (tasks.length > 0) {
-        // Ajoute les tâches dans le tableau
-        tasks.forEach((task) => {
-          const row = `
-            <tr>
-              <td>${task.name}</td>
-              <td>${task.priority}</td>
-              <td>${task.status}</td>
-              <td>${task.dueDate}</td>
-            </tr>
-          `;
-          taskBody.innerHTML += row;
-        });
-      } else {
-        // Affiche un message si aucune tâche n'est trouvée
-        taskBody.innerHTML = '<tr><td colspan="4">Aucune tâche trouvée</td></tr>';
-      }
+  const developerList = document.getElementById("developer-list");
+  console.log("Conteneur trouvé:", developerList);
 
-      // Affiche la zone des tâches
-      taskContainer.style.display = 'block';
-    })
-    .catch((error) => {
-      console.error('Erreur lors de la récupération des tâches :', error);
+  developerList.style.display = "block";
+  developerList.innerHTML = ""; // Vide le conteneur avant de le remplir
+
+  if (developers.length > 0) {
+
+  developers.forEach(developer => {
+  const devElement = document.createElement("p");
+  devElement.textContent = developer;
+  developerList.appendChild(devElement);
+  });
+  } else {
+  developerList.textContent = "Aucun développeur trouvé pour ce projet.";
+  }
+  })
+  .catch(error => {
+  console.error("Erreur:", error);
+  alert("Une erreur est survenue lors de la récupération des développeurs.");
+  });
+  }
+
+
+
+
+  // Ajout de la fonctionnalité pour ajouter une tâche
+    document.getElementById('addTaskButton').addEventListener('click', function() {
+      document.getElementById('addTaskForm').style.display = 'block';
+      this.style.display = 'none';
     });
-}  const taskContainer = document.getElementById(`tasks-${projectName}`);
 
-function fetchTasks(button) {
-  const projectName = button.getAttribute("data-projectname");
-
-  const url = `/projects/${projectName}/tasks`;  // URL pour récupérer les tâches du projet
-
-  fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des tâches.");
-      }
-      return response.json(); // Retourne les tâches en format JSON
-    })
-    .then(tasks => {
-      console.log("Réponse des tâches : ", tasks);
-    tasks.forEach((task, index) => {
-
-    console.log( task.nomT);
-    console.log(task.priorite);
-    console.log(task.dateEch);
-    console.log( task.status);
-    console.log( task.mail);
-    console.log( task.numP);
-
-});
-   const taskList = document.getElementById("taskList");
-
-if (tasks.length > 0) {
-    tasks.forEach(task => {
-        const row = document.createElement("tr");
-
-        // Créer les cellules pour chaque propriété de la tâche
-        const tdNomT = document.createElement("td");
-        tdNomT.textContent = task.nomT;
-
-        const tdPriorite = document.createElement("td");
-        tdPriorite.textContent = task.priorite;
-
-        const tdDateEch = document.createElement("td");
-        tdDateEch.textContent = task.dateEch;
-
-        const tdNumP = document.createElement("td");
-        tdNumP.textContent = task.nomP;
-        const tdNumU = document.createElement("td");
-        tdNumU.textContent = task.mail;
-
-        const tdStatus = document.createElement("td");
-        tdStatus.textContent = task.status;
-
-        const tdDependence = document.createElement("td");
-
-        // Formulaire avec champ de texte et bouton de soumission
-       tdDependence.innerHTML = `
-    <button onclick="showDependencies('${task.nomT}')">Afficher Dépendances</button>
-    <form onsubmit="addDependency(event, '${task.nomT}', this)">
-        <input type="text" id="dependencyName-${task.nomT}" placeholder="Nom d'une tâche dépendante" style="width: 100%;" required>
-        <button type="submit">Ajouter Dépendance</button>
-    </form>
-    <ul id="dependencies-list-${task.nomT}" style="display:none;"></ul> <!-- Liste des dépendances -->
-`;
-
-        const tdActions = document.createElement("td");
-        tdActions.innerHTML = `
-            <button onclick="editTask(this)" class="btn btn-danger btn-sm">Éditer</button>
-            <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
-        `;
-         // Ajouter toutes les cellules dans la ligne
-        row.appendChild(tdNomT);
-        row.appendChild(tdPriorite);
-        row.appendChild(tdDateEch);
-        row.appendChild(tdNumP);
-        row.appendChild(tdNumU);
-        row.appendChild(tdStatus);
-        row.appendChild(tdDependence);
-        row.appendChild(tdActions);
-
-        // Ajouter la ligne à la table
-        taskList.appendChild(row);
-    });
-} else {
-    taskList.innerHTML = "<tr><td colspan='8'>Aucune tâche trouvée.</td></tr>";
-}
-    })
-    .catch(error => {
-      console.error("Erreur:", error);
-      alert("Une erreur est survenue lors de la récupération des tâches.");
-    });
-}
-function addDependency(event, taskName, form) {
-    event.preventDefault(); // Empêche la soumission classique
-
-    // Récupère la valeur du champ de saisie associé au formulaire
-    const dependencyInput = form.querySelector('input[type="text"]');
-    const dependencyName = dependencyInput.value;
-
-    // Vérifie si une valeur a été entrée
-    if (!dependencyName) {
-        alert("Veuillez entrer un nom de tâche dépendante.");
-        return;
+    function cancelAddTask() {
+      document.getElementById('addTaskForm').style.display = 'none';
+      document.getElementById('addTaskButton').style.display = 'block';
     }
 
-    // Créer un objet avec les données
-    const data = {
-        taskName: taskName, // Tâche cible
-        dependencyName: dependencyName // Dépendance saisie
-    };
+    // Logique pour ajouter une tâche dynamique dans le tableau
+    document.getElementById('taskForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Récupération des données du formulaire
+      const taskName = document.getElementById('taskName').value;
+      const taskPriority = document.getElementById('taskPriority').value;
+      const taskDueDate = document.getElementById('taskDueDate').value;
+      const taskProjet = document.getElementById('taskProjet').value;
+      const taskAdmin = document.getElementById('taskAdmin').value;
+      const taskStatus = document.getElementById('taskStatus').value;
+      const daysLeft = calculateDaysLeft(taskDueDate);
+      const rowClass = daysLeft < 7 ? 'danger' : daysLeft < 30 ? 'warning' : '';
 
-    // Envoie des données au backend
-    fetch('/add-dependency', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.text())
-    .then(data => {
-        console.log('Réponse du backend:', data);
-        alert(`Dépendance ajoutée à ${taskName}`);
+      const row = document.createElement('tr');
+      row.className = rowClass;
 
-        // Efface le champ de saisie après soumission
-        dependencyInput.value = '';
-    })
-    .catch((error) => {
-        console.error('Erreur:', error);
-        alert("Une erreur est survenue.");
+      row.innerHTML = `
+        <td>${taskName}</td>
+        <td>${taskPriority}</td>
+        <td>${taskDueDate}</td>
+        <td>${taskProjet}</td>
+
+
+
+  <td>
+  ${taskAdmin}
+  </td>
+   <select class="form-control" onchange="changeTaskStatus(this)">
+      <option value="No" ${taskStatus === 'unstarted' ? 'selected' : ''}>unstarted</option>
+    </select>
+  </td>
+        <td>
+        <button onclick="editTask(this) class="btn btn-danger btn-sm">Éditer</button>
+          <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
+        </td>
+      `;
+      document.getElementById('taskList').appendChild(row);
+      cancelAddTask();
     });
-}
-function showDependencies(taskName) {
-    const url = `/tasks/${taskName}`;
-    const dependenciesList = document.getElementById(`dependencies-list-${taskName}`);
-
-    dependenciesList.style.display = "block";
-    dependenciesList.innerHTML = "Chargement...";
+  // Fonction pour récupérer et remplir les administrateurs (ou développeurs) en fonction du projet
+  function updateAdminList(projectName) {
+    const url = `/projects/${projectName}/developers`;  // L'URL pour récupérer les développeurs par projet
 
     fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Erreur lors de la récupération des dépendances.");
-            }
-            return response.json();
-        })
-        .then(dependencies => {
-            dependenciesList.innerHTML = ""; // Nettoyer avant de remplir
-            if (dependencies.length > 0) {
-                dependencies.forEach(dep => {
-                    const li = document.createElement("li");
-                    li.textContent = dep;
-                    dependenciesList.appendChild(li);
-                });
-            } else {
-                dependenciesList.textContent = "Aucune dépendance trouvée.";
-            }
-        })
-        .catch(error => {
-            console.error(error);
-            dependenciesList.textContent = "Erreur lors du chargement.";
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des administrateurs.");
+        }
+        return response.json();
+      })
+      .then(developers => {
+        const taskAdminSelect = document.getElementById('taskAdmin');
+        taskAdminSelect.innerHTML = '';  // Vide la liste avant de la remplir
+
+        // Ajouter un élément par défaut "Choisir un administrateur"
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Choisir un administrateur';
+        taskAdminSelect.appendChild(defaultOption);
+
+        // Ajouter chaque développeur (ou administrateur) dans la liste des options
+        developers.forEach(developer => {
+          const option = document.createElement('option');
+          option.value = developer;  // Le nom du développeur (administrateur)
+          option.textContent = developer;  // Le nom à afficher dans la liste
+          taskAdminSelect.appendChild(option);
         });
-}
+      })
+      .catch(error => {
+        console.error("Erreur:", error);
+        alert("Une erreur est survenue lors de la récupération des administrateurs.");
+      });
+  }
+
+    function deleteTask(button) {
+      const row = button.closest('tr');
+      row.remove();
+    }
+
+    function calculateDaysLeft(dueDate) {
+      const currentDate = new Date();
+      const dueDateObj = new Date(dueDate);
+      const diffTime = dueDateObj - currentDate;
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+     function changeTaskAdmin(select) {
+    const row = select.closest('tr');
+    const newAdmin = select.value;
+    // Mettre à jour la cellule d'administrateur directement si besoin
+    row.cells[4].querySelector('select').value = newAdmin;}
+  function changeTaskStatus(select) {
+    const row = select.closest('tr');
+    const newAdmin = select.value;
+    // Mettre à jour la cellule d'administrateur directement si besoin
+    row.cells[5].querySelector('select').value = newAdmin;}
+  function fetchTasks(projectName) {
+    const taskBody = document.getElementById(`task-body-${projectName}`);
+
+    // Envoi de la requête au backend
+    fetch(`/tasks?projectName=${encodeURIComponent(projectName)}`, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((tasks) => {
+        // Efface le contenu précédent
+        taskBody.innerHTML = '';
+
+        if (tasks.length > 0) {
+          // Ajoute les tâches dans le tableau
+          tasks.forEach((task) => {
+            const row = `
+              <tr>
+                <td>${task.name}</td>
+                <td>${task.priority}</td>
+                <td>${task.status}</td>
+                <td>${task.dueDate}</td>
+              </tr>
+            `;
+            taskBody.innerHTML += row;
+          });
+        } else {
+          // Affiche un message si aucune tâche n'est trouvée
+          taskBody.innerHTML = '<tr><td colspan="4">Aucune tâche trouvée</td></tr>';
+        }
+
+        // Affiche la zone des tâches
+        taskContainer.style.display = 'block';
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la récupération des tâches :', error);
+      });
+  }  const taskContainer = document.getElementById(`tasks-${projectName}`);
+
+  function fetchTasks(button) {
+    const projectName = button.getAttribute("data-projectname");
+
+    const url = `/projects/${projectName}/tasks`;  // URL pour récupérer les tâches du projet
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des tâches.");
+        }
+        return response.json(); // Retourne les tâches en format JSON
+      })
+      .then(tasks => {
+        console.log("Réponse des tâches : ", tasks);
+      tasks.forEach((task, index) => {
+
+      console.log( task.nomT);
+      console.log(task.priorite);
+      console.log(task.dateEch);
+      console.log( task.status);
+      console.log( task.mail);
+      console.log( task.numP);
+
+  });
+     const taskList = document.getElementById("taskList");
+
+  if (tasks.length > 0) {
+      tasks.forEach(task => {
+          const row = document.createElement("tr");
+
+          // Créer les cellules pour chaque propriété de la tâche
+          const tdNomT = document.createElement("td");
+          tdNomT.textContent = task.nomT;
+
+          const tdPriorite = document.createElement("td");
+          tdPriorite.textContent = task.priorite;
+
+          const tdDateEch = document.createElement("td");
+          tdDateEch.textContent = task.dateEch;
+
+          const tdNumP = document.createElement("td");
+          tdNumP.textContent = task.nomP;
+          const tdNumU = document.createElement("td");
+          tdNumU.textContent = task.mail;
+
+          const tdStatus = document.createElement("td");
+          tdStatus.textContent = task.status;
+
+          const tdDependence = document.createElement("td");
+
+          // Formulaire avec champ de texte et bouton de soumission
+         tdDependence.innerHTML = `
+      <button onclick="showDependencies('${task.nomT}')">Afficher Dépendances</button>
+      <form onsubmit="addDependency(event, '${task.nomT}', this)">
+          <input type="text" id="dependencyName-${task.nomT}" placeholder="Nom d'une tâche dépendante" style="width: 100%;" required>
+          <button type="submit">Ajouter Dépendance</button>
+      </form>
+      <ul id="dependencies-list-${task.nomT}" style="display:none;"></ul> <!-- Liste des dépendances -->
+  `;
+
+          const tdActions = document.createElement("td");
+          tdActions.innerHTML = `
+              <button onclick="editTask(this)" class="btn btn-danger btn-sm">Éditer</button>
+              <button onclick="deleteTask(this)" class="btn btn-danger btn-sm">Supprimer</button>
+          `;
+           // Ajouter toutes les cellules dans la ligne
+          row.appendChild(tdNomT);
+          row.appendChild(tdPriorite);
+          row.appendChild(tdDateEch);
+          row.appendChild(tdNumP);
+          row.appendChild(tdNumU);
+          row.appendChild(tdStatus);
+          row.appendChild(tdDependence);
+          row.appendChild(tdActions);
+
+          // Ajouter la ligne à la table
+          taskList.appendChild(row);
+      });
+  } else {
+      taskList.innerHTML = "<tr><td colspan='8'>Aucune tâche trouvée.</td></tr>";
+  }
+      })
+      .catch(error => {
+        console.error("Erreur:", error);
+        alert("Une erreur est survenue lors de la récupération des tâches.");
+      });
+  }
+  function addDependency(event, taskName, form) {
+      event.preventDefault(); // Empêche la soumission classique
+
+      // Récupère la valeur du champ de saisie associé au formulaire
+      const dependencyInput = form.querySelector('input[type="text"]');
+      const dependencyName = dependencyInput.value;
+
+      // Vérifie si une valeur a été entrée
+      if (!dependencyName) {
+          alert("Veuillez entrer un nom de tâche dépendante.");
+          return;
+      }
+
+      // Créer un objet avec les données
+      const data = {
+          taskName: taskName, // Tâche cible
+          dependencyName: dependencyName // Dépendance saisie
+      };
+
+      // Envoie des données au backend
+      fetch('/add-dependency', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+      })
+      .then(response => response.text())
+      .then(data => {
+          console.log('Réponse du backend:', data);
+          alert(`Dépendance ajoutée à ${taskName}`);
+
+          // Efface le champ de saisie après soumission
+          dependencyInput.value = '';
+      })
+      .catch((error) => {
+          console.error('Erreur:', error);
+          alert("Une erreur est survenue.");
+      });
+  }
+  function showDependencies(taskName) {
+      const url = `/tasks/${taskName}`;
+      const dependenciesList = document.getElementById(`dependencies-list-${taskName}`);
+
+      dependenciesList.style.display = "block";
+      dependenciesList.innerHTML = "Chargement...";
+
+      fetch(url)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error("Erreur lors de la récupération des dépendances.");
+              }
+              return response.json();
+          })
+          .then(dependencies => {
+              dependenciesList.innerHTML = ""; // Nettoyer avant de remplir
+              if (dependencies.length > 0) {
+                  dependencies.forEach(dep => {
+                      const li = document.createElement("li");
+                      li.textContent = dep;
+                      dependenciesList.appendChild(li);
+                  });
+              } else {
+                  dependenciesList.textContent = "Aucune dépendance trouvée.";
+              }
+          })
+          .catch(error => {
+              console.error(error);
+              dependenciesList.textContent = "Erreur lors du chargement.";
+          });
+  }
 
 </script>
 </body>

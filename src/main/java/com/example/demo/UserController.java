@@ -89,6 +89,12 @@ public class UserController {
                             List<Project> userProject =ProjectService.getProjectsByDeveloperId(userId);
                             System.out.println("projets"+userProject);
                             model.addAttribute("projects", userProject);
+                            List<Map<String, String>> userTaches = TacheService.getTacheByProjectdeveloppeur(userId);
+                            System.out.println("Tâches : " + userTaches);
+                            // Ajouter les projets et les tâches au modèle pour l'affichage dans la vue
+                            model.addAttribute("projects", userProject);
+                            model.addAttribute("tasks", userTaches);
+
                             return "dashboarduser";
                         case "admin" :
                             return "dashboardAdmin";

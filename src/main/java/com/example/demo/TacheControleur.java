@@ -1,5 +1,8 @@
 package com.example.demo;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +18,7 @@ public class TacheControleur {
     private final DatabaseManager databaseManager;
     private  final TacheService TacheService;
     private final UserService UserService;
+
     private final ProjectService ProjectService;
 
     public TacheControleur(TacheService TacheService,UserService userService,ProjectService projectService) {
@@ -132,5 +136,25 @@ public class TacheControleur {
         System.out.println("Dépendances: " + dependencies);
         return dependencies; // Automatiquement converti en JSON
     }
+    @PostMapping("/updateTaskStatus")
+    public String updateTaskStatus(@RequestParam("taskName") String taskId,
+                                   @RequestParam("status") String status,
+                                   RedirectAttributes redirectAttributes) {
+        // Appeler la méthode verifierEtModifierStatut pour vérifier et modifier le statut
+        boolean statutModifie = TacheService.verifierEtModifierStatut(taskId, status);
+
+        if (statutModifie) {
+            // Si le statut a été modifié avec succès
+            redirectAttributes.addFlashAttribute("successMessage", "Le statut de la tâche a été modifié avec succès.");
+        } else {
+            // Si la modification n'a pas eu lieu
+            redirectAttributes.addFlashAttribute("errorMessage", "La modification du statut a échoué.");
+        }
+
+        // Rediriger vers le tableau de bord pour rafraîchir la page
+        return "dashboarduser";
+    }
+
+
 
 }

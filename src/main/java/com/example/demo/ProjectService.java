@@ -60,8 +60,8 @@ public class ProjectService {
             String newidP = generateNextProjectId(connection);
             stmt.setString(1, newidP); // id
             stmt.setString(2, name); // name
-            stmt.setString(3, description); // description
-            stmt.setDate(4, Date.valueOf(startDate)); //start_date
+           stmt.setString(3, description); // description
+         stmt.setDate(4, Date.valueOf(startDate)); //start_date
             stmt.setDate(5, Date.valueOf(endDate)); // end_date
             stmt.setInt(6, progres);
             stmt.setString(7, userId); // user_id// progress
@@ -100,6 +100,7 @@ public class ProjectService {
                         rs.getInt("progres"),
                         new User(userId)
                 );
+
                 projects.add(project);
             }
 
@@ -202,7 +203,7 @@ public class ProjectService {
     public static List<String> getDeveloppeuridByProjectid(String projectid) {
         List<String> developerIds = new ArrayList<>();
 
-       String query = "SELECT u.mail " +
+        String query = "SELECT u.mail " +
                 "FROM Utilisateur u " +
                 "JOIN developpeur d ON d.numU = u.numU " +
                 "JOIN project_developpeur p ON p.numU = d.numU " +
@@ -237,6 +238,5 @@ public class ProjectService {
     }
 
 }
-
 
 

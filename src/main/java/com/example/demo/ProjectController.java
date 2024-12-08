@@ -9,8 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.*;
+
 import static com.example.demo.DatabaseManager.isOnline;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +28,7 @@ public class ProjectController {
     private final DatabaseManager databaseManager;
     private final ProjectService ProjectService;
     private final UserService UserService;
-     String projectiden;;
+    String projectiden;;
     public ProjectController(DeveloppeurRepository developpeurRepository, UserService UserService, ProjectService ProjectService) {
         this.databaseManager = new DatabaseManager("jdbc:mysql://sql7.freesqldatabase.com:3306/sql7743283", "sql7743283", "aC2kDrfGsk");
         this.ProjectService = ProjectService;
@@ -42,7 +45,12 @@ public class ProjectController {
 
     // ajouter un projet
     @PostMapping("/addProject")
-    public String registerProject(Project project, HttpSession session, Model model) throws SQLException {
+    public String registerProject(@RequestParam String name,
+                                  @RequestParam String description,
+                                  @RequestParam String startDate,  // Correspond au champ "startDate" du formulaire
+                                  @RequestParam String endDate,    // Correspond au champ "endDate" du formulaire
+                                  @RequestParam int progres,
+                                  HttpSession session, Model model) throws SQLException {
         String userEmail = (String) session.getAttribute("userEmail");
         if (!isOnline()) {
             databaseManager.connexion();
@@ -50,24 +58,40 @@ public class ProjectController {
         }
 
         String userId = ProjectService.getUserIdByEmail(userEmail);
-        System.out.println("name" + project.getName());
-        System.out.println("Description" + project.getDescription());
-        System.out.println("startDate" + project.getStartDate());
-        System.out.println(" endDate" + project.getEndDate());
+        System.out.println("name" + name);
+        System.out.println("Description" + description);
+        System.out.println("startDate" + startDate);
+        System.out.println(" endDate" + endDate);
+        System.out.println(" endDate" + userId);
+
         if (userId != null) { // vérifier que l'utilisateur a bien été trouvé
             // Insérer le projet avec l'ID de l'utilisateur récupéré
             List<Project> userProjects = ProjectService.getProjectByUserId(userId);
+            // Convertir les dates de String à Date
+            String start = null;
+            Date end = null;
+            try {
+                if (startDate != null && !startDate.isEmpty()) {
+                    start = String.valueOf(Date.valueOf(startDate)); // Convertir la date de début
+                }
+                if (endDate != null && !endDate.isEmpty()) {
+                    end = Date.valueOf(endDate); // Convertir la date de fin
+                }
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("errorMessage", "Les dates sont invalides.");
+                return "project-management"; // Retourner sur la page d'ajout de projet en cas d'erreur
+            }
             boolean success = ProjectService.insererProjet(
-                    project.getName(),
-                    project.getDescription(),
-                    project.getStartDate(),
-                    project.getEndDate(),
-                    project.getProgres(),
+                    name,
+                    description,
+                    String.valueOf(start),
+                    String.valueOf(end),
+                    progres,
                     userId);
             model.addAttribute("successMessage", "Le projet a été enregistré avec succès !");
             model.addAttribute("projects", userProjects);
             if (success) {
-                List<Project> Projects = ProjectService.getProjectByUserId(userId);
+                List<Project> Projects = com.example.demo.ProjectService.getProjectByUserId(userId);
                 model.addAttribute("projects", Projects);
                 return "dashboardManager"; // Redirige vers le tableau de bord après ajout
             } else {
@@ -214,12 +238,12 @@ public class ProjectController {
     @ResponseBody
     public List<String> showProjectDevelopers(@PathVariable String name, Model model) {
         System.out.println("projetid"+ name);
-            // Récupérer l'ID du projet à partir du nom
-            projectiden= com.example.demo.ProjectService.getProjectIdByName(name);
+        // Récupérer l'ID du projet à partir du nom
+        projectiden= com.example.demo.ProjectService.getProjectIdByName(name);
 
 
-            // Ajoutez les informations au modèle
-            model.addAttribute("projectId", projectiden);
+        // Ajoutez les informations au modèle
+        model.addAttribute("projectId", projectiden);
         // Récupérer l'ID du projet par son nom
 
         System.out.println("projetid"+ projectiden);

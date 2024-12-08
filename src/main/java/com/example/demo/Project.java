@@ -45,6 +45,7 @@ public class Project  implements Serializable {
         this.user=user;
     }
 
+
     public Project() {
 
     }
@@ -70,7 +71,7 @@ public class Project  implements Serializable {
     public void setEndDate(String endDate) { this.endDate = endDate; }
     public int getProgres(){return progres;}
     public void  setProgres(int  progres){
-      this.progres=progres;
+        this.progres=progres;
     }
     public User getUser(){
         return user;
@@ -88,7 +89,6 @@ public class Project  implements Serializable {
     }
 
 }
-
 
 
 
