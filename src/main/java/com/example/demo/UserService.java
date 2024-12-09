@@ -302,56 +302,5 @@ public class UserService {
 
         return null; // retourne null si l'utilisateur n'est pas trouvé ou pas développeur
     }
-    public boolean modifierProfil(String mail, String nom, String prenom, String email, String motDePasse) {
-        String query = "UPDATE Utilisateur SET nomU = ?, prenomU = ?, mail = ?, motdepasse = ? WHERE mail = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            // Définir les paramètres
-            stmt.setString(1, nom);
-            stmt.setString(2, prenom);
-            stmt.setString(3, email);
-            stmt.setString(4, motDePasse);
-            stmt.setString(5, mail);
-
-            // Exécuter la requête
-            int rowsUpdated = stmt.executeUpdate();
-
-            // Vérifier si une ligne a été mise à jour
-            if (rowsUpdated > 0) {
-                System.out.println("Profil mis à jour avec succès !");
-                return true;
-            } else {
-                System.out.println("Aucun utilisateur trouvé avec cet ID.");
-                return false;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    public String getUserRole(String email, String mdp) {
-
-        // Requête SELECT pour récupérer les utilisateurs
-        String selectQuery = "SELECT role FROM Utilisateur WHERE mail = ? AND motdepasse = ?";
-        String role = "";
-
-        // Afficher les données après insertion
-        try (PreparedStatement stmtSelect = connection.prepareStatement(selectQuery)) {
-
-            stmtSelect.setString(1, email);
-            stmtSelect.setString(2, mdp);
-            ResultSet rs = stmtSelect.executeQuery();
-
-            // Parcours des résultats et affichage
-            System.out.println("Liste des utilisateurs :");
-            while (rs.next()) {
-                role = rs.getString("role");
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return role;
-    }
 
 }

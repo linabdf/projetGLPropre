@@ -34,6 +34,7 @@ public class DatabaseManagerTestIntegration {
         api.connexion();
         api.deconnexion();
         assertFalse(DatabaseManager.isOnline(), "La connexion doit être fermée.");
+
     }
     
     @Test

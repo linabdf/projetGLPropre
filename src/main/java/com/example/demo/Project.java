@@ -44,11 +44,10 @@ public class Project  implements Serializable {
         this.progres =progres;
         this.user=user;
     }
+    public Project() {}
 
 
-    public Project() {
 
-    }
 
 
     // Getters et setters

@@ -105,11 +105,7 @@
 			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>6.0.2.Final</version> <!-- Mettre à jour à la version compatible -->
-		</dependency>
+
 	</dependencies>
 
 	<build>

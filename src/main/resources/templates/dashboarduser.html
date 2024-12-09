@@ -150,14 +150,27 @@
             <p>Email de l'utilisateur : <span th:text="${session.userEmail}"></span></p>
 
           </div>
+          <form th:action="@{/projet/{projectName}(projectName=${projet.name})}" method="get">
+            <!-- Utilisez la méthode GET pour appeler le contrôleur afficherProjet avec un paramètre projectName -->
+            <button type="submit" class="btn btn-primary">Afficher les commentaires</button>
+          </form>
+
+          <!-- Partie pour afficher les commentaires -->
           <div class="project-comments">
             <h3>Commentaires</h3>
+
+            <!-- Affichage des commentaires -->
             <div th:each="commentaire : ${commentaires}">
               <div class="comment-card">
-                <p><strong th:text="${commentaire.user.name}"></strong></p>  <!-- Nom de l'utilisateur qui a laissé le commentaire -->
-                <p th:text="${commentaire.content}"></p>  <!-- Texte du commentaire -->
+                <p th:text="${commentaire}"></p>  <!-- Texte du commentaire -->
               </div>
             </div>
+
+            <!-- Message quand il n'y a pas de commentaires -->
+            <div th:if="${#lists.isEmpty(commentaires)}">
+              <p>Aucun commentaire pour ce projet.</p>
+            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -214,6 +227,7 @@
       }
     }
   </script>
+
   </tbody>
 </table>
 </body>

@@ -56,7 +56,31 @@ public class CommentaireService {
             }
             return false;
         }
+  /*  public static List<commentaire> getCommentairesByProjectId(String projectId) {
+        String query = "SELECT id,contenu,numSender,numP FROM Commentaire WHERE numP = ?";
+        List<commentaire> commentaires = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, projectId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                commentaire commentaire = new commentaire(
+                        rs.getInt("ID"),
+                        rs.getString("contenu"),
+                        rs.getString("numSender"),
+                        rs.getString("numP")
 
+                );
+                commentaires.add(commentaire);
+
+            }
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return commentaires;
+    }*/
         /**
          * Récupérer l'ID d'un projet à partir de son nom.
          *

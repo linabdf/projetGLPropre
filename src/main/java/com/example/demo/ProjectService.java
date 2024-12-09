@@ -236,7 +236,110 @@ public class ProjectService {
 
         return developerIds;
     }
+  /*  public static Project getProjectById(String projectId, String userId) {
 
+    	/*
+        String query = "SELECT * FROM Projet WHERE numP = ?";
+        System.out.println("Projet1: "+ projectId);
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, projectId);
+            ResultSet resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+            	 // Récupérer la chaîne de la base de données
+                String startDateString = (resultSet.getString("dateDebP"));
+                String endDateString = (resultSet.getString("dateFinP"));
+
+                // Convertir les chaînes en objets Date
+                Date startDate = Date.valueOf(startDateString); // Convertit la chaîne en Date
+                Date endDate = Date.valueOf(endDateString); // Convertit la chaîne en Date
+                User user = new User(userId);
+
+                System.out.println("Projet2: "+ projectId);
+
+                Project project = new Project(
+                		resultSet.getString("nomP"),
+                		resultSet.getString("description"),
+                        startDate,
+                        endDate,
+                        resultSet.getInt("progres"),
+                        new User(userId));
+                 */
+
+        // Si le projet est déjà en mémoire, retourner l'instance existante
+       /* if (projects.containsKey(projectId)) {
+            return projects.get(projectId);
+        }
+
+        // Sinon, créer une nouvelle instance depuis la base de données
+        String query = "SELECT * FROM Projet WHERE numP = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, projectId);
+            ResultSet resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+                String startDateString = resultSet.getString("dateDebP");
+                String endDateString = resultSet.getString("dateFinP");
+
+                Date startDate = Date.valueOf(startDateString);
+                Date endDate = Date.valueOf(endDateString);
+
+                Project project = new Project(
+                        resultSet.getString("nomP"),
+                        resultSet.getString("description"),
+                        startDate,
+                        endDate,
+                        resultSet.getInt("progres"),
+                        new User(userId));
+
+                // Mettre en cache dans la map pour persistance temporaire
+                projects.put(projectId, project);
+                System.out.println("Projet mis en cache : " + project);
+
+                // Créer et retourner un objet Project
+                System.out.println("Projet0: "+ project);
+                return project;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;  // Retourner null si aucun projet n'est trouvé
+    }
+*/public static List<String> getCommentaireProjectid(String name) {
+            List<String> developerIds = new ArrayList<>();
+
+            String query = "SELECT contenu " +
+                    "FROM Commentaire c " +
+                    "JOIN Projet p ON p.numP = c.numP " +
+                    "WHERE p.nomP = ?";
+     /*   String query = "SELECT d.numU " +
+                "FROM project_developpeur d " +
+                "WHERE d.nump = ?";
+       */
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+
+                stmt.setString(1, name);
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    // Parcourir les résultats et ajouter les numU à la liste
+                    while (resultSet.next()) {
+                        String developerId = resultSet.getString("contenu");
+                        System.out.println("developerId"+developerId);
+                        developerIds.add(developerId);
+                    }
+                    System.out.println("developerIds"+developerIds);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace(); // Ajoutez plus de gestion des erreurs si nécessaire
+                throw new RuntimeException("Erreur lors de la récupération des développeurs", e);
+            }
+
+            // Si la liste est vide, cela signifie qu'il n'y a pas de développeur associé à ce projet
+            if (developerIds.isEmpty()) {
+                System.out.println("Aucun développeur n'est associé à ce projet.");
+            }
+
+            return developerIds;
+        }
 }
 
 

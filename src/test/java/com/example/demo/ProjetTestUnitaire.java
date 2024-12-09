@@ -33,6 +33,7 @@ public class ProjetTestUnitaire {
         assertEquals(endDate.toString(), project.getEndDate(), "La date de fin devrait correspondre à celle fournie.");
         assertEquals(progres, project.getProgres(), "Le progrès du projet devrait correspondre à celui fourni.");
         assertEquals(user, project.getUser(), "L'utilisateur associé au projet devrait correspondre à celui fourni.");
+
     }
 
     @Test
