@@ -30,3 +30,6 @@ jobs:
       # Build et exécution des tests
       - name: Build and run tests with Maven
         run: mvn clean install
+   # Étape 4: Exécuter les tests avec Maven
+      - name: Run tests with Maven
+        run: mvn test  # Exécuter les tests après la compilation
