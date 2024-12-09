@@ -1,0 +1,35 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout le code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Installer JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Installer Maven via APT
+      - name: Install Maven
+        run: |
+          sudo apt update
+          sudo apt install -y maven
+
+      # Build et exécution des tests
+      - name: Build and run tests with Maven
+        run: mvn clean install
+   # Étape 4: Exécuter les tests avec Maven
+      - name: Run tests with Maven
+        run: mvn test  # Exécuter les tests après la compilation
