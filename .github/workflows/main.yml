@@ -26,7 +26,7 @@ jobs:
 
       # Étape 3: Configurer Maven
       - name: Set up Maven
-        uses: actions/setup-maven@v3
+        uses: actions/setup-maven@v2
 
       # Étape 4: Compiler et exécuter les tests avec Maven
       - name: Build and run tests with Maven
