@@ -1,0 +1,40 @@
+name: Java CI with Maven and Spring Boot
+
+on:
+  push:
+    branches:
+      - main  # Déclenche le pipeline lors d'un push sur la branche principale
+  pull_request:
+    branches:
+      - main  # Déclenche le pipeline lors d'une pull request vers la branche principale
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Utilisation de l'environnement Ubuntu pour exécuter le pipeline
+
+    steps:
+      # Étape 1: Vérifier le code source depuis GitHub
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2: Configurer JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'  # Utilisation de la version JDK 17
+          distribution: 'temurin'  # Utilisation de la distribution Temurin (OpenJDK)
+
+      # Étape 3: Configurer Maven
+      - name: Set up Maven
+        uses: actions/setup-maven@v3
+
+      # Étape 4: Compiler et exécuter les tests avec Maven
+      - name: Build and run tests with Maven
+        run: mvn clean install -DskipTests=false  # Nettoyer, installer et exécuter les tests
+
+      # Étape 5: (optionnel) Publier l'artefact du build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: spring-boot-artifact
+          path: target/*.jar  # Remplacez par le chemin vers l'artefact généré (fichier .jar)
