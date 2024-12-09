@@ -14,6 +14,11 @@ public class Chef_Projet extends User{
     public Chef_Projet(String name, String email, String password) {
             super(name, email, password);
     }
+
+    public Chef_Projet() {
+
+    }
+
     public List<Developpeur> getDeveloppeurs() {
         return developpeur;
     }

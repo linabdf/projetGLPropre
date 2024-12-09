@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier Profil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Modifier Profil</h2>
+    <form id="GererForm" action= "/update" method="post">
+        <!-- Nom -->
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom :</label>
+            <input type="text" name="nom"  placeholder="Nom" required>
+        </div>
+
+        <!-- Prénom -->
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom :</label>
+            <input type="text" name="prenom"  placeholder="Prénom" required>
+        </div>
+
+        <!-- Adresse e-mail -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Adresse e-mail :</label>
+            <input type="email" name="email" placeholder="Adresse e-mail" required>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe :</label>
+            <input type="password" name="password" placeholder="Nouveau mot de passe" required>
+        </div>
+        <div>
+            <p class="error-message">
+                <!-- Si le modèle contient "errorMessage", affichez-le -->
+                <span th:text="${errorMessageUpdate}"></span>
+            </p>
+        </div>
+
+
+
+        <!-- Bouton de soumission -->
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+    </form>
+</div>
+
+
+</body>
+</html>

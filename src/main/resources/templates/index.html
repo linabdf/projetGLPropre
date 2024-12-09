@@ -107,7 +107,7 @@
     <!-- Section Connexion -->
     <div id="Connexion">
         <h2><i class="fas fa-sign-in-alt icon"></i>Connexion</h2>
-        <form id="loginForm" action="/connection" method="post">
+        <form id="loginForm"  method="post">
             <input type="email" id="email" name="email" placeholder="Email" required>
             <input type="password" id="password" name="password" placeholder="Mot de passe" required>
 
@@ -118,8 +118,11 @@
                 </p>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+            <button type="submit" formaction="/connection" class="btn btn-primary btn-block">Se connecter</button>
+            <button type="submit" formaction="/profil" class="btn btn-primary btn-block">Gérer profil</button>
+
         </form>
+
         <p id="loginMessage"></p>
     </div>
 </div>
