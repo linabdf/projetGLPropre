@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 import java.sql.*;
-import java.util.List;
 
-import org.apiguardian.api.API;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,8 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class DatabaseManagerTestIntegration {
 
     private DatabaseManager api = new DatabaseManager("jdbc:mysql://sql7.freesqldatabase.com:3306/sql7743283","sql7743283","aC2kDrfGsk");
- 
-    
  
 
     @Test
@@ -34,7 +30,6 @@ public class DatabaseManagerTestIntegration {
         api.connexion();
         api.deconnexion();
         assertFalse(DatabaseManager.isOnline(), "La connexion doit être fermée.");
-
     }
     
     @Test

@@ -340,6 +340,35 @@ public class ProjectService {
 
             return developerIds;
         }
+    public boolean getNameProjet(String name) {
+
+        String query = "SELECT nomP FROM Projet";
+
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+
+                String projet = rs.getString("nomP");
+
+                if (projet.equals(name)) {
+
+                    return false;
+
+                }
+
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
+
+        return true;
+
+    }
 }
 
 

@@ -19,7 +19,6 @@ public class Chef_projetTestUnitaire {
         assertEquals("alice.manager@example.com", chefDeProjet.getEmail(), "L'email du chef de projet est incorrect.");
         assertEquals("securepassword", chefDeProjet.getPassword(), "Le mot de passe du chef de projet est incorrect.");
         assertNull(chefDeProjet.getDeveloppeurs(), "La liste des développeurs devrait être null par défaut.");
-       System.out.println("true");
     }
 
     @Test

@@ -70,6 +70,8 @@ public class UserTestUnitaire {
 
         user.setUserType("Admin");
         assertEquals("Admin", user.getUserType(), "Le type d'utilisateur devrait être 'Admin'.");
+        
+       
     }
 
     @Test

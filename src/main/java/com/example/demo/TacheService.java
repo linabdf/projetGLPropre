@@ -21,10 +21,10 @@ public class TacheService {
         this.databaseManager = databaseManager;
     }
 
-    public static String generateNextProjectId(Connection conn) {
+    public static String generateNextProjectId() {
         String newId = "T001";
         String query = "SELECT MAX(numT)AS lastId FROM Tache";
-        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        try (Statement stmt =connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 String lastId = rs.getString("lastId");
                 if (lastId != null) {
@@ -42,7 +42,7 @@ public class TacheService {
     public boolean insererTache(String nomT, String dateEch, String priorite, String status, String numP, String numU) {
         String query = "INSERT INTO Tache(numT,nomT,dateEch,priorite,status,numP,numU)VALUES(?,?,?,?,?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            String newidP = generateNextProjectId(connection);
+            String newidP = generateNextProjectId();
             stmt.setString(1, newidP); // id
             stmt.setString(2, nomT); // name
 
@@ -254,45 +254,7 @@ public List<String> getDependantesTache(String tacheid) {
         }
         return resultList;
     }
-    /*
-    public boolean verifierEtModifierStatut(String tacheName, String nouveauStatut) {
-        // Vérification de l'existence de la tâche et du statut actuel
-        String querySelect = "SELECT status FROM Tache WHERE nomT = ?";
 
-        try (PreparedStatement stmtSelect = connection.prepareStatement(querySelect)) {
-            stmtSelect.setString(1, tacheName); // Remplir le paramètre `nomT`
-
-            try (ResultSet rs = stmtSelect.executeQuery()) {
-                if (rs.next()) {
-                    // Récupération du statut actuel
-                    String statusActuel = rs.getString("status");
-
-                    // Si le statut actuel est 'unstarted' et le nouveau statut est 'begin'
-                    if( ("unstarted".equals(statusActuel) && "begin".equals(nouveauStatut))||("begin".equals(statusActuel) && "finished".equals(nouveauStatut))) {
-                        // Mise à jour du statut
-                        String queryUpdate = "UPDATE Tache SET status = ? WHERE nomT = ?";
-
-                        try (PreparedStatement stmtUpdate = connection.prepareStatement(queryUpdate)) {
-                            stmtUpdate.setString(1, nouveauStatut); // Remplir le nouveau statut
-                            stmtUpdate.setString(2, tacheName); // Remplir le nom de la tâche
-
-                            int rowsUpdated = stmtUpdate.executeUpdate();
-
-                            // Si la mise à jour a réussi, on retourne true
-                            return rowsUpdated > 0;
-                        }
-                    } else {
-                        // Si les conditions ne sont pas remplies, on ne fait rien
-                        return false;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la vérification ou de la mise à jour de la tâche", e);
-        }
-        return false; // Retourne false si la tâche n'existe pas ou si le statut n'est pas 'unstarted'
-    }
-*/
     public boolean verifierEtModifierStatut(String tacheName, String nouveauStatut) {
         // Vérification de l'existence de la tâche et du statut actuel
         String querySelect = "SELECT status, numT FROM Tache WHERE nomT = ?";  // Ajout de numT pour utiliser dans la vérification des dépendances
@@ -361,26 +323,5 @@ public List<String> getDependantesTache(String tacheid) {
         return false; // Retourne false si la tâche n'existe pas ou si les dépendances ne sont pas toutes "finished"
     }
 
- /*
-public List<String> getDependantesTache(String tacheid) {
-    List<String> dependantes = new ArrayList<>();
-    String query = "SELECT d.nomT FROM Tache d " +  // Notez l'espace avant "JOIN"
-            "JOIN  Tache_dependance  t ON t.numT = d.numT " +      // Notez l'espace après "d.numT"
-            "WHERE d.numT = ?";
 
-    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-        stmt.setString(1, tacheid);  // Set the task ID for which you want to find dependent tasks
-
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                dependantes.add(rs.getString("nomT"));  // Add each dependent task to the list
-            }
-        }
-    } catch (SQLException e) {
-        throw new RuntimeException("Erreur lors de la récupération des tâches dépendantes", e);
-    }
-
-    return dependantes;
-}
-*/
 }

@@ -200,4 +200,71 @@ public class UserController {
 
 
 */
+   @PostMapping("/update")
+
+   public String updateProfile(
+           @RequestParam String nom,
+           @RequestParam String prenom,
+           @RequestParam String email,
+           @RequestParam String password,
+           Model model) {
+
+       // Appeler la méthode pour modifier les données
+       if(UserService.verifierutilisateur(email)){
+           UserService.modifierProfil(Adressemail, nom, prenom, email, password);
+           model.addAttribute("successMessage", "Profil mis à jour avec succès !");
+           return "index";
+
+       }else{
+           model.addAttribute("errorMessageUpdate", "L'addresse mail est déjà utilisée");
+           return "profil";
+       }
+
+   }
+
+
+
+    @PostMapping("/profil")
+    public String gererProfil(User user, Model model,HttpSession session) {
+        // Traitez ici les données utilisateur
+
+
+        if (!DatabaseManager.isOnline()) {
+            databaseManager.connexion();// Connecter à la base de données si ce n'est pas déjà fait
+        }
+
+
+        // Afficher les informations dans la console
+
+        System.out.println("Email : " + user.getEmail());
+        System.out.println("Password : " + user.getPassword());
+
+
+
+        if(UserService.connectionutilisateur(user.getEmail(), user.getPassword())) { // si le compte existe
+
+            String role = UserService.getUserRole(user.getEmail(), user.getPassword());
+            session.setAttribute("userEmail", user.getEmail());
+            String userId = UserService.getUserIdByEmail(user.getEmail());
+            if (userId != null) {
+
+                Adressemail = user.getEmail();
+                return "profil";
+
+            } else {
+                model.addAttribute("errorMessage", "Utilisateur non trouvé.");
+                return "index"; // Redirige vers l'accueil si l'ID utilisateur est invalide
+            }
+
+
+
+        }
+        else {
+            model.addAttribute("errorMessageconnection", "Email ou mot de passe incorrect. Veuillez réessayer.");
+            return "index"; // rester sur la page incription
+        }
+
     }
+
+
+}

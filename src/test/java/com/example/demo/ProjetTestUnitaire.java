@@ -33,7 +33,6 @@ public class ProjetTestUnitaire {
         assertEquals(endDate.toString(), project.getEndDate(), "La date de fin devrait correspondre à celle fournie.");
         assertEquals(progres, project.getProgres(), "Le progrès du projet devrait correspondre à celui fourni.");
         assertEquals(user, project.getUser(), "L'utilisateur associé au projet devrait correspondre à celui fourni.");
-
     }
 
     @Test
@@ -107,4 +106,12 @@ public class ProjetTestUnitaire {
         project.setProgres(120); // Progrès supérieur à 100
         assertEquals(120, project.getProgres(), "Le progrès supérieur à 100 devrait être accepté par défaut (ou vérifié dans la logique métier).");
     }
+    
+    
+   
+
+
+  
 }
+    
+   
