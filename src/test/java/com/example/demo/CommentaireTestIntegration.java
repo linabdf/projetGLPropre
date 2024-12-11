@@ -25,10 +25,10 @@ public class CommentaireTestIntegration {
 
 
         boolean res= Commentaire.addComment("Project47", "test1@example.com", "offf");
-     //   boolean res1= Commentaire.addComment("gggggggg", "massil@gmail.com", "offf");
+       boolean res1= Commentaire.addComment("gggggggg", "massil@gmail.com", "offf");
        // boolean res2= Commentaire.addComment("gggggggg", "mass@gmail.com", "offf");
         assertTrue(res,"succes");
-       // assertFalse(res1,"succes");
+        assertFalse(res1,"succes");
 
     }
 

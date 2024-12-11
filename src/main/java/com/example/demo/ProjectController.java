@@ -24,7 +24,7 @@ public class ProjectController {
 
     @Autowired
     private DeveloppeurRepository developpeurRepository;
-    private ProjectRepository ProjectRepository;
+
     private final DatabaseManager databaseManager;
     private final ProjectService ProjectService;
     private final UserService UserService;

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.demo.DatabaseManager.connection;
-import static com.example.demo.ProjectRepository.*;
+
 
 @Service
 public class ProjectService {
@@ -17,8 +17,8 @@ public class ProjectService {
     public ProjectService(DatabaseManager databaseManager) {
         this.databaseManager = databaseManager;
     }
-    @Autowired
-    private ProjectRepository ProjectRepository;
+
+
 
     // Génération d'un ID pour un nouveau projet
     public static String generateNextProjectId(Connection conn) {
@@ -369,6 +369,13 @@ public class ProjectService {
         return true;
 
     }
+    /*public boolean changeProgres(String nomP){
+
+        String queryUpdate = "UPDATE Tache SET progres= ? WHERE nomP = ?";
+        if(progres(String numP))
+
+    }*/
+
 }
 
 

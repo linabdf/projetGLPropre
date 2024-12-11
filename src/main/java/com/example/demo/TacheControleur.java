@@ -139,9 +139,10 @@ public class TacheControleur {
     @PostMapping("/updateTaskStatus")
     public String updateTaskStatus(@RequestParam("taskName") String taskId,
                                    @RequestParam("status") String status,
+
                                    RedirectAttributes redirectAttributes) {
-        // Appeler la méthode verifierEtModifierStatut pour vérifier et modifier le statut
-        boolean statutModifie = TacheService.verifierEtModifierStatut(taskId, status);
+        // Appeler la méthode ModifierStatut pour vérifier et modifier le statut
+        boolean statutModifie = TacheService.ModifierStatut(taskId, status);
 
         if (statutModifie) {
             // Si le statut a été modifié avec succès

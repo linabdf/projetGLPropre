@@ -16,15 +16,22 @@ import static com.example.demo.DatabaseManager.connection;
 public class TacheService {
     @Autowired
     private final DatabaseManager databaseManager;
+    private ProjectService projectService;
+    private UserService UserService;
 
-    public TacheService(DatabaseManager databaseManager) {
-        this.databaseManager = databaseManager;
+
+    public TacheService(DatabaseManager databasemanager, ProjectService projetservice, UserService userservice) {
+
+        this.databaseManager = databasemanager;
+        this.projectService = projetservice;
+        this.UserService = userservice;
+
     }
 
     public static String generateNextProjectId() {
         String newId = "T001";
         String query = "SELECT MAX(numT)AS lastId FROM Tache";
-        try (Statement stmt =connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 String lastId = rs.getString("lastId");
                 if (lastId != null) {
@@ -39,7 +46,7 @@ public class TacheService {
     }
 
 
-    public boolean insererTache(String nomT, String dateEch, String priorite, String status, String numP, String numU) {
+    public static boolean insererTache(String nomT, String dateEch, String priorite, String status, String numP, String numU) {
         String query = "INSERT INTO Tache(numT,nomT,dateEch,priorite,status,numP,numU)VALUES(?,?,?,?,?,?,?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             String newidP = generateNextProjectId();
@@ -187,27 +194,28 @@ public class TacheService {
         return false;
     }
 
-public List<String> getDependantesTache(String tacheid) {
-    List<String> dependantes = new ArrayList<>();
-    String query = "SELECT t2.nomT " +
-            "FROM Tache_dependance d " +
-            "JOIN Tache t1 ON t1.numT = d.numT " +
-            "JOIN Tache t2 ON t2.numT = d.depT " +
-            "WHERE t1.numT = ?";
-    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-        stmt.setString(1, tacheid);  // Set the task ID for which you want to find dependent tasks
+    public List<String> getDependantesTache(String tacheid) {
+        List<String> dependantes = new ArrayList<>();
+        String query = "SELECT t2.nomT " +
+                "FROM Tache_dependance d " +
+                "JOIN Tache t1 ON t1.numT = d.numT " +
+                "JOIN Tache t2 ON t2.numT = d.depT " +
+                "WHERE t1.numT = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, tacheid);  // Set the task ID for which you want to find dependent tasks
 
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                dependantes.add(rs.getString("nomT"));  // Add each dependent task to the list
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    dependantes.add(rs.getString("nomT"));  // Add each dependent task to the list
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la récupération des tâches dépendantes", e);
         }
-    } catch (SQLException e) {
-        throw new RuntimeException("Erreur lors de la récupération des tâches dépendantes", e);
+
+        return dependantes;
     }
 
-    return dependantes;
-}
     public static List<Map<String, String>> getTacheByProjectdeveloppeur(String numU) {
         List<Tache> taches = new ArrayList<>();
         List<Map<String, String>> resultList = new ArrayList<>();
@@ -219,7 +227,7 @@ public List<String> getDependantesTache(String tacheid) {
         System.out.println("Fetching tasks for project: " + numU);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1,numU);  // Remplir le paramètre avec le nom du projet
+            stmt.setString(1, numU);  // Remplir le paramètre avec le nom du projet
             ResultSet resultSet = stmt.executeQuery();
 
 
@@ -255,7 +263,7 @@ public List<String> getDependantesTache(String tacheid) {
         return resultList;
     }
 
-    public boolean verifierEtModifierStatut(String tacheName, String nouveauStatut) {
+    public boolean ModifierStatut(String tacheName, String nouveauStatut) {
         // Vérification de l'existence de la tâche et du statut actuel
         String querySelect = "SELECT status, numT FROM Tache WHERE nomT = ?";  // Ajout de numT pour utiliser dans la vérification des dépendances
 
@@ -300,6 +308,7 @@ public List<String> getDependantesTache(String tacheid) {
                                 // Mise à jour du statut
                                 String queryUpdate = "UPDATE Tache SET status = ? WHERE nomT = ?";
 
+
                                 try (PreparedStatement stmtUpdate = connection.prepareStatement(queryUpdate)) {
                                     stmtUpdate.setString(1, nouveauStatut); // Remplir le nouveau statut
                                     stmtUpdate.setString(2, tacheName); // Remplir le nom de la tâche
@@ -309,6 +318,7 @@ public List<String> getDependantesTache(String tacheid) {
                                     // Si la mise à jour a réussi, on retourne true
                                     return rowsUpdated > 0;
                                 }
+
                             } else {
                                 // Si les conditions ne sont pas remplies (par exemple, une dépendance n'est pas terminée)
                                 return false;
@@ -321,6 +331,42 @@ public List<String> getDependantesTache(String tacheid) {
             throw new RuntimeException("Erreur lors de la vérification ou de la mise à jour de la tâche", e);
         }
         return false; // Retourne false si la tâche n'existe pas ou si les dépendances ne sont pas toutes "finished"
+    }
+
+    public int afficherNombretache(String numP) throws SQLException {
+        int count = 0;
+        String checkQuery = "SELECT COUNT(*) FROM Tache WHERE numP = ?";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+            checkStmt.setString(1, numP);
+            ResultSet resultSet = checkStmt.executeQuery();
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+            return count;
+        }
+    }
+    public int afficherNombretachefini(String numP) throws SQLException {
+        int count = 0;
+        String checkQuery = "SELECT COUNT(*) FROM Tache WHERE numP = ? and status = finished";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+            checkStmt.setString(1, numP);
+            ResultSet resultSet = checkStmt.executeQuery();
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+            return count;
+        }
+    }
+    public double progres(String numP) throws SQLException {
+        double progres=0;
+        int nbtache=afficherNombretache(numP);
+        int nbtachefini=afficherNombretachefini(numP);
+        if(nbtache!=0&&(nbtachefini!=0)){
+             progres= (nbtachefini*100)/nbtache;
+
+
+        }
+        return progres;
     }
 
 
