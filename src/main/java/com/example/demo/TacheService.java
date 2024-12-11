@@ -18,8 +18,6 @@ public class TacheService {
     private final DatabaseManager databaseManager;
     private ProjectService projectService;
     private UserService UserService;
-
-
     public TacheService(DatabaseManager databasemanager, ProjectService projetservice, UserService userservice) {
 
         this.databaseManager = databasemanager;
@@ -27,7 +25,6 @@ public class TacheService {
         this.UserService = userservice;
 
     }
-
     public static String generateNextProjectId() {
         String newId = "T001";
         String query = "SELECT MAX(numT)AS lastId FROM Tache";
@@ -44,11 +41,9 @@ public class TacheService {
         }
         return newId;
     }
-
-
     public static boolean insererTache(String nomT, String dateEch, String priorite, String status, String numP, String numU) {
-        String query = "INSERT INTO Tache(numT,nomT,dateEch,priorite,status,numP,numU)VALUES(?,?,?,?,?,?,?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            String query = "INSERT INTO Tache(numT,nomT,dateEch,priorite,status,numP,numU)VALUES(?,?,?,?,?,?,?)";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
             String newidP = generateNextProjectId();
             stmt.setString(1, newidP); // id
             stmt.setString(2, nomT); // name
@@ -58,10 +53,6 @@ public class TacheService {
             stmt.setString(5, status);
             stmt.setString(6, numP);
             stmt.setString(7, numU);
-
-
-            // user_id// progress
-
             int rowsAffected = stmt.executeUpdate();
             System.out.println(rowsAffected + " ligne projet insérée(s) !");
             return true;
@@ -79,7 +70,7 @@ public class TacheService {
                 "JOIN Utilisateur u ON u.numU = t.numU " +
                 "JOIN Projet p ON p.numP = t.numP " +
                 "WHERE p.nomP = ?";
-        System.out.println("Fetching tasks for project: " + projectName);
+                System.out.println("Fetching tasks for project: " + projectName);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, projectName);  // Remplir le paramètre avec le nom du projet
@@ -262,6 +253,15 @@ public class TacheService {
         }
         return resultList;
     }
+    public void mettreAJourProgresProjet(String projectId, double nouveauProgres) throws SQLException {
+        String updateQuery = "UPDATE Projet SET progres = ? WHERE numP = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+            stmt.setDouble(1, nouveauProgres);
+            stmt.setString(2, projectId);
+            stmt.executeUpdate();
+            System.out.println("Progrès mis à jour pour le projet : " + projectId);
+        }
+    }
 
     public boolean ModifierStatut(String tacheName, String nouveauStatut) {
         // Vérification de l'existence de la tâche et du statut actuel
@@ -314,9 +314,14 @@ public class TacheService {
                                     stmtUpdate.setString(2, tacheName); // Remplir le nom de la tâche
 
                                     int rowsUpdated = stmtUpdate.executeUpdate();
-
-                                    // Si la mise à jour a réussi, on retourne true
-                                    return rowsUpdated > 0;
+                                    if (rowsUpdated > 0) {
+                                        // Recalculez le progrès du projet
+                                        String projectId = getProjectIdByTask(tacheName);
+                                        System.out.println("projetid"+projectId);// Méthode pour récupérer l'ID du projet à partir de la tâche
+                                        double nouveauProgres = progres(projectId); // Recalcule le progrès
+                                        mettreAJourProgresProjet(projectId, nouveauProgres); // Met à jour le progrès du projet dans la BD
+                                        return true;
+                                    }
                                 }
 
                             } else {
@@ -331,6 +336,19 @@ public class TacheService {
             throw new RuntimeException("Erreur lors de la vérification ou de la mise à jour de la tâche", e);
         }
         return false; // Retourne false si la tâche n'existe pas ou si les dépendances ne sont pas toutes "finished"
+    }
+    // Méthode pour récupérer l'ID du projet associé à une tâche
+    private String getProjectIdByTask(String taskId) throws SQLException {
+        String query = "SELECT numP FROM Tache WHERE nomT = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, taskId);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("numP");
+                }
+            }
+        }
+        return null;
     }
 
     public int afficherNombretache(String numP) throws SQLException {
@@ -347,7 +365,8 @@ public class TacheService {
     }
     public int afficherNombretachefini(String numP) throws SQLException {
         int count = 0;
-        String checkQuery = "SELECT COUNT(*) FROM Tache WHERE numP = ? and status = finished";
+        String checkQuery = "SELECT COUNT(*) FROM Tache WHERE numP = ? and status = 'finished'";
+       // String statusDependant = rsDependances.getString("status");
         try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
             checkStmt.setString(1, numP);
             ResultSet resultSet = checkStmt.executeQuery();
@@ -357,15 +376,18 @@ public class TacheService {
             return count;
         }
     }
+
     public double progres(String numP) throws SQLException {
-        double progres=0;
-        int nbtache=afficherNombretache(numP);
-        int nbtachefini=afficherNombretachefini(numP);
-        if(nbtache!=0&&(nbtachefini!=0)){
-             progres= (nbtachefini*100)/nbtache;
+        int nbtache = afficherNombretache(numP); // Nombre total de tâches
+        int nbtachefini = afficherNombretachefini(numP); // Nombre de tâches terminées
 
-
+        // Éviter la division par zéro
+        if (nbtache == 0) {
+            return 0.0; // Aucun progrès si aucune tâche
         }
+
+        // Calculer le progrès en pourcentage
+        double progres = ((double) nbtachefini / nbtache) * 100;
         return progres;
     }
 

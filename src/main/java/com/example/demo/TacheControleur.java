@@ -139,7 +139,6 @@ public class TacheControleur {
     @PostMapping("/updateTaskStatus")
     public String updateTaskStatus(@RequestParam("taskName") String taskId,
                                    @RequestParam("status") String status,
-
                                    RedirectAttributes redirectAttributes) {
         // Appeler la méthode ModifierStatut pour vérifier et modifier le statut
         boolean statutModifie = TacheService.ModifierStatut(taskId, status);
