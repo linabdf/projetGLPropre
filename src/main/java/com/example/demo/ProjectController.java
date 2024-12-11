@@ -9,10 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.*;
-
-import static com.example.demo.DatabaseManager.isOnline;
-
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -23,25 +19,27 @@ import java.util.Map;
 public class ProjectController {
 
     @Autowired
-    private DeveloppeurRepository developpeurRepository;
+
 
     private final DatabaseManager databaseManager;
     private final ProjectService ProjectService;
     private final UserService UserService;
-    String projectiden;;
-    public ProjectController(DeveloppeurRepository developpeurRepository, UserService UserService, ProjectService ProjectService) {
+    String projectiden;
+
+
+    public ProjectController(UserService UserService, ProjectService ProjectService) {
         this.databaseManager = new DatabaseManager("jdbc:mysql://sql7.freesqldatabase.com:3306/sql7743283", "sql7743283", "aC2kDrfGsk");
         this.ProjectService = ProjectService;
         this.UserService = UserService;
-        this.developpeurRepository = developpeurRepository;
-
     }
+
 
     @GetMapping("/project-management")
     public String showAddProjectForm() {
         return "project-management";
         // nom du template HTML pour ajouter un projet
     }
+
 
     // ajouter un projet
     @PostMapping("/addProject")
@@ -51,8 +49,9 @@ public class ProjectController {
                                   @RequestParam String endDate,    // Correspond au champ "endDate" du formulaire
                                   @RequestParam int progres,
                                   HttpSession session, Model model) throws SQLException {
+
         String userEmail = (String) session.getAttribute("userEmail");
-        if (!isOnline()) {
+        if (!databaseManager.isOnline()) {
             databaseManager.connexion();
             // Connecter à la base de données si ce n'est pas déjà fait
         }
@@ -91,7 +90,7 @@ public class ProjectController {
             model.addAttribute("successMessage", "Le projet a été enregistré avec succès !");
             model.addAttribute("projects", userProjects);
             if (success) {
-                List<Project> Projects = com.example.demo.ProjectService.getProjectByUserId(userId);
+                List<Project> Projects = ProjectService.getProjectByUserId(userId);
                 model.addAttribute("projects", Projects);
                 return "dashboardManager"; // Redirige vers le tableau de bord après ajout
             } else {
@@ -137,47 +136,11 @@ public class ProjectController {
         }
     }
 
-    /*
-    @GetMapping("/adduser/{name}")
-    public String showAddUserPage( Model model) {
-        // Vous pouvez récupérer le projet par son nom
-        //  String project = ProjectService.getProjectIdByName(name);
-        //model.addAttribute("project", project);
-        //System.out.println("projet id"+project);
-        return "adduser"; // Retourne la page adduser.html
-    }
-    @PostMapping("/adduser/{name}")
-    public ResponseEntity<Map<String, String>> checkDeveloppeur(@PathVariable String name,@RequestParam String email,Model model) {
-        String project = ProjectService.getProjectIdByName(name);
-        model.addAttribute("project", project);
-        System.out.println("projet id"+project);
-        Map<String, String> response = new HashMap<>();
 
-        String developpeurId =  UserService.getDeveloppeurIdByEmail(email);
-        System.out.println("dev"+developpeurId);
-        if (developpeurId != null) {
-
-            boolean sucess = ProjectService.addDeveloperToProject(project,developpeurId );
-            if(sucess){
-                response.put("message", "Le développeur existe déjà avec ID : " + developpeurId);
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-            }
-            else {
-                response.put("message", "Erreur lors de l'ajout du développeur au projet.");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-            }
-
-
-        } else {
-            response.put("message", "L'utilisateur n'existe pas comme développeur.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    }
-*/
     @GetMapping("/adduser/{name}")
     public String showAddUserPage(@PathVariable String name, Model model) {
         // Récupérer l'ID du projet à partir du nom
-        projectiden= com.example.demo.ProjectService.getProjectIdByName(name);
+        projectiden= ProjectService.getProjectIdByName(name);
 
 
         // Ajoutez les informations au modèle
@@ -186,6 +149,7 @@ public class ProjectController {
         System.out.println("Nom du projet : " + projectiden);
         return "adduser";
     }
+
 
     @PostMapping("/adduser")
     public ResponseEntity<Map<String, String>> addUserToProject(
@@ -221,6 +185,8 @@ public class ProjectController {
             boolean success = ProjectService.addDeveloperToProject(developpeurId, projectiden);
 
             if (success) {
+
+
                 response.put("message", "Le développeur a été ajouté avec succès au projet.");
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
@@ -234,12 +200,13 @@ public class ProjectController {
         }
     }
 
+
     @GetMapping("/projects/{name}/developers")
     @ResponseBody
     public List<String> showProjectDevelopers(@PathVariable String name, Model model) {
         System.out.println("projetid"+ name);
         // Récupérer l'ID du projet à partir du nom
-        projectiden= com.example.demo.ProjectService.getProjectIdByName(name);
+        projectiden= ProjectService.getProjectIdByName(name);
 
 
         // Ajoutez les informations au modèle
@@ -248,7 +215,7 @@ public class ProjectController {
 
         System.out.println("projetid"+ projectiden);
         // Récupérer les IDs des développeurs associés au projet
-        List<String> developpeurIds = com.example.demo.ProjectService.getDeveloppeuridByProjectid( projectiden);
+        List<String> developpeurIds = ProjectService.getDeveloppeuridByProjectid( projectiden);
 
         // Retourner la liste des développeurs au format JSON
         return developpeurIds;

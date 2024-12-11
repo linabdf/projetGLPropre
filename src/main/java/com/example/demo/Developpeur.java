@@ -20,15 +20,24 @@ public class Developpeur extends User {
         super(name, email, password);
     }
 
+
     public Developpeur(String numU) {
         this.numU=numU;
     }
+
+
+    public Developpeur(String id, String chef_projet) {
+        this.numU=id;
+    }
+
+
     @Override
     public String toString() {
         return "Developpeur{" +
                 "id='" + numU + '\''+
                 '}';
     }
+
 
     // Getter pour obtenir le nom du chef de projet
     public String getChefDeProjetNom() {
@@ -37,26 +46,37 @@ public class Developpeur extends User {
         }
         return null;  // Si pas de chef de projet assigné
     }
+
+
     public String getId() {
         return numU;
     }
+
+    public void setId(String id) {
+        this.numU = id;
+    }
+
 
     // Getters et setters pour chefDeProjet
     public Chef_Projet getChefDeProjet() {
         return chef_Projet;
     }
 
+
     public void setChefDeProjet(Chef_Projet chef_Projet) {
         this.chef_Projet = chef_Projet;
     }
+
+
     public List<Project> getProjects() {
         return projects;
     }
 
+
     public void setProjects(List<Project> projects) {
         this.projects = projects;
     }
-    // Autres getters et setters spécifiques au développeur
+
 
 
 }

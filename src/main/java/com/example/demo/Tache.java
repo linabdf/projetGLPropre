@@ -10,6 +10,9 @@ import java.util.List;
 @Entity
 @Table(name = "Tache")
 public class Tache implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
@@ -136,6 +139,6 @@ public class Tache implements Serializable {
                 ", priority='" + priority + '\'' +
                 ", status='" + status + '\'' +
                 ", dueDate='" + dueDate + '\'' +
-                ", developpeur=" + (developpeur != null ? developpeur.toString() : "null") +
+                ", developpeur=" + (developpeur != null ? developpeur.getId() : "null") +
                 '}';
     }}

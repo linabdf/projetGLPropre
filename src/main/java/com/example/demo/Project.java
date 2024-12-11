@@ -1,5 +1,5 @@
 package com.example.demo;
-//model
+
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -9,7 +9,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "Projet")
-public class Project  implements Serializable {
+public class Project  implements Serializable{
+
+    private static final long serialVersionUID = 1L;
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
@@ -33,9 +37,10 @@ public class Project  implements Serializable {
             joinColumns = @JoinColumn(name = "numP"),
             inverseJoinColumns = @JoinColumn(name = "numU")
     )
+
     private List<Developpeur> developpeurs = new ArrayList<>();
 
-    // public Project(){}
+
     public Project(String name, String description, Date startDate, Date endDate, int progres, User user){
         this.name=name;
         this.description=description;
@@ -44,49 +49,92 @@ public class Project  implements Serializable {
         this.progres =progres;
         this.user=user;
     }
-    public Project() {}
 
 
+    public Project() {
 
+    }
 
 
     // Getters et setters
     public String getId() {
         return id;
     }
+
+
     public void setId(String id) {
         this.id= id;
     }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 
-    public String getDescription() { return description; }
-    public void setDescription(String email) { this.description = description; }
 
-    public String getStartDate() { return startDate; }
-    public void setStartDate(String StartDate) { this.startDate= startDate; }
+    public String getName() {
+        return name;
+    }
 
-    public String getEndDate() { return endDate; }
-    public void setEndDate(String endDate) { this.endDate = endDate; }
-    public int getProgres(){return progres;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public String getDescription() {
+        return description;
+    }
+
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+
+    public void setStartDate(String startDate) {
+        this.startDate= startDate;
+    }
+
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+
+    public int getProgres(){
+        return progres;
+    }
+
+
     public void  setProgres(int  progres){
         this.progres=progres;
     }
+
+
     public User getUser(){
         return user;
     }
+
+
     public void setUser(User user){
         this.user=user;
     }
-    // Getters et Setters
+
+
     public List<Developpeur> getDeveloppeurs() {
         return developpeurs;
     }
 
+
     public void setDeveloppeurs(List<Developpeur> developpeurs) {
         this.developpeurs = developpeurs;
     }
-
 }
 
 

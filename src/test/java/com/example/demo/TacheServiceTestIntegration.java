@@ -49,9 +49,7 @@ public class TacheServiceTestIntegration {
         String numU = userservice.getUserIdByEmail("task344@example.com");
 
         boolean res= Tache.insererTache("tacheM", "2024-12-12","moyenne", "unstarted",numP,numU);
-      //  boolean res1= TacheService.insererTache("tache", "2024-12-12","moyenne", "unstarted","",numU);
         assertTrue(res,"la tache est inserer avec succées");
-        //Assertions.assertFalse(res1,"l'insertion est echoué");
 
 
     }
@@ -76,7 +74,7 @@ public class TacheServiceTestIntegration {
     void modifierStatut_Negative() {
         // Cas où TacheB est terminée et TacheA peut passer de "unstarted" à "begin"
 
-        boolean result1 = Tache.ModifierStatut("Tache1000", "finished");
+        boolean result1 = Tache.ModifierStatut("Tache1000", "unstarted");
         assertFalse( "Le statut de la tâche doit être mis à jour avec succès.",result1);
 
     }

@@ -7,13 +7,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.demo.DatabaseManager.connection;
 
 
 @Service
 public class ProjectService {
+
+
     @Autowired
     private final DatabaseManager databaseManager;
+
     public ProjectService(DatabaseManager databaseManager) {
         this.databaseManager = databaseManager;
     }
@@ -21,12 +23,13 @@ public class ProjectService {
 
 
     // Génération d'un ID pour un nouveau projet
-    public static String generateNextProjectId(Connection conn) {
+    public  String generateNextProjectId() {
         String newId = "P001";  // Valeur par défaut si la table est vide
 
         String query = "SELECT MAX(numP) AS lastId FROM Projet";
 
-        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        try (Statement stmt = databaseManager.getConnexion().createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 String lastId = rs.getString("lastId");
                 if (lastId != null) {
@@ -40,9 +43,10 @@ public class ProjectService {
         return newId;
     }
 
+
     public String getUserIdByEmail(String email) {
         String query = "SELECT numU FROM Utilisateur WHERE mail = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -54,14 +58,15 @@ public class ProjectService {
         return null; // retourne null si l'utilisateur n'est pas trouvé
     }
 
+
     public boolean insererProjet(String name, String description, String startDate, String endDate, int progres, String userId) {
         String query = "INSERT INTO Projet (numP, nomP, description, dateDebP, dateFinP, progres, numU) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            String newidP = generateNextProjectId(connection);
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
+            String newidP = generateNextProjectId();
             stmt.setString(1, newidP); // id
             stmt.setString(2, name); // name
-           stmt.setString(3, description); // description
-         stmt.setDate(4, Date.valueOf(startDate)); //start_date
+            stmt.setString(3, description); // description
+            stmt.setDate(4, Date.valueOf(startDate)); //start_date
             stmt.setDate(5, Date.valueOf(endDate)); // end_date
             stmt.setInt(6, progres);
             stmt.setString(7, userId); // user_id// progress
@@ -74,11 +79,12 @@ public class ProjectService {
         return false;
     }
 
-    public static List<Project> getProjectByUserId(String userId) {
+
+    public List<Project> getProjectByUserId(String userId) {
         List<Project> projects = new ArrayList<>();
         String query = "SELECT numP, nomP, description,dateDebP,dateFinP, progres FROM Projet WHERE numU = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
 
@@ -91,7 +97,6 @@ public class ProjectService {
                 // Convertir les chaînes en objets Date
                 Date startDate = Date.valueOf(startDateString); // Convertit la chaîne en Date
                 Date endDate = Date.valueOf(endDateString); // Convertit la chaîne en Date
-                User user = new User(userId);
                 Project project = new Project(
                         rs.getString("nomP"),
                         rs.getString("description"),
@@ -109,17 +114,17 @@ public class ProjectService {
         }
 
         return projects;
-
-
     }
-    public static List<Project> getProjectsByDeveloperId(String developerId) {
+
+
+    public  List<Project> getProjectsByDeveloperId(String developerId) {
         // Cette méthode interroge la base de données pour récupérer les projets associés à un développeur
         String query = "SELECT nomP FROM Projet p " +
                 "JOIN project_developpeur d ON d.numP = p.numP " +
                 "WHERE d.numU = ?"; // Correction : d.numP => d.numD (si developerId correspond à numD)
         List<Project> projects = new ArrayList<>();
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
             stmt.setString(1, developerId); // Assignation de l'ID du développeur à la requête
             ResultSet rs = stmt.executeQuery();
 
@@ -136,11 +141,13 @@ public class ProjectService {
 
         return projects; // Retourner la liste des projets
     }
-    public static String getProjectIdByName(String projectName) {
+
+
+    public  String getProjectIdByName(String projectName) {
         String projectId = null;
         String query = "SELECT numP FROM Projet WHERE nomP = ?"; // Recherche par nom de projet
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
             stmt.setString(1, projectName); // Set le nom du projet
             ResultSet rs = stmt.executeQuery();
 
@@ -154,10 +161,12 @@ public class ProjectService {
 
         return projectId; // Retourne l'ID du projet, ou null si non trouvé
     }
-    public static boolean addDeveloperToProject(String developerId, String projectId) {
+
+
+    public boolean addDeveloperToProject(String developerId, String projectId) {
         // Étape 1 : Vérifier si la ligne existe déjà dans la table project_developpeur
         String checkQuery = "SELECT COUNT(*) FROM project_developpeur WHERE numU = ? AND nump = ?";
-        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+        try (PreparedStatement checkStmt = databaseManager.getConnexion().prepareStatement(checkQuery)) {
             // Définir les paramètres de la requête
             checkStmt.setString(1, developerId);
             checkStmt.setString(2, projectId);
@@ -179,7 +188,7 @@ public class ProjectService {
 
         // Étape 2 : Si l'association n'existe pas, insérer la nouvelle ligne
         String query = "INSERT INTO project_developpeur (numU, nump) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
             // Définir les paramètres de la requête
             stmt.setString(1, developerId);  // ID du développeur
             stmt.setString(2, projectId);    // ID du projet
@@ -200,7 +209,8 @@ public class ProjectService {
         }
     }
 
-    public static List<String> getDeveloppeuridByProjectid(String projectid) {
+
+    public List<String> getDeveloppeuridByProjectid(String projectid) {
         List<String> developerIds = new ArrayList<>();
 
         String query = "SELECT u.mail " +
@@ -208,11 +218,7 @@ public class ProjectService {
                 "JOIN developpeur d ON d.numU = u.numU " +
                 "JOIN project_developpeur p ON p.numU = d.numU " +
                 "WHERE p.nump = ?";
-     /*   String query = "SELECT d.numU " +
-                "FROM project_developpeur d " +
-                "WHERE d.nump = ?";
-       */
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
 
             stmt.setString(1, projectid);
             try (ResultSet resultSet = stmt.executeQuery()) {
@@ -236,146 +242,57 @@ public class ProjectService {
 
         return developerIds;
     }
-  /*  public static Project getProjectById(String projectId, String userId) {
 
-    	/*
-        String query = "SELECT * FROM Projet WHERE numP = ?";
-        System.out.println("Projet1: "+ projectId);
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, projectId);
-            ResultSet resultSet = stmt.executeQuery();
+    public  List<String> getCommentaireProjectid(String name) {
+        List<String> developerIds = new ArrayList<>();
 
-            if (resultSet.next()) {
-            	 // Récupérer la chaîne de la base de données
-                String startDateString = (resultSet.getString("dateDebP"));
-                String endDateString = (resultSet.getString("dateFinP"));
-
-                // Convertir les chaînes en objets Date
-                Date startDate = Date.valueOf(startDateString); // Convertit la chaîne en Date
-                Date endDate = Date.valueOf(endDateString); // Convertit la chaîne en Date
-                User user = new User(userId);
-
-                System.out.println("Projet2: "+ projectId);
-
-                Project project = new Project(
-                		resultSet.getString("nomP"),
-                		resultSet.getString("description"),
-                        startDate,
-                        endDate,
-                        resultSet.getInt("progres"),
-                        new User(userId));
-                 */
-
-        // Si le projet est déjà en mémoire, retourner l'instance existante
-       /* if (projects.containsKey(projectId)) {
-            return projects.get(projectId);
-        }
-
-        // Sinon, créer une nouvelle instance depuis la base de données
-        String query = "SELECT * FROM Projet WHERE numP = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, projectId);
-            ResultSet resultSet = stmt.executeQuery();
-
-            if (resultSet.next()) {
-                String startDateString = resultSet.getString("dateDebP");
-                String endDateString = resultSet.getString("dateFinP");
-
-                Date startDate = Date.valueOf(startDateString);
-                Date endDate = Date.valueOf(endDateString);
-
-                Project project = new Project(
-                        resultSet.getString("nomP"),
-                        resultSet.getString("description"),
-                        startDate,
-                        endDate,
-                        resultSet.getInt("progres"),
-                        new User(userId));
-
-                // Mettre en cache dans la map pour persistance temporaire
-                projects.put(projectId, project);
-                System.out.println("Projet mis en cache : " + project);
-
-                // Créer et retourner un objet Project
-                System.out.println("Projet0: "+ project);
-                return project;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;  // Retourner null si aucun projet n'est trouvé
-    }
-*/public static List<String> getCommentaireProjectid(String name) {
-            List<String> developerIds = new ArrayList<>();
-
-            String query = "SELECT contenu " +
-                    "FROM Commentaire c " +
-                    "JOIN Projet p ON p.numP = c.numP " +
-                    "WHERE p.nomP = ?";
-     /*   String query = "SELECT d.numU " +
-                "FROM project_developpeur d " +
-                "WHERE d.nump = ?";
-       */
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-
-                stmt.setString(1, name);
-                try (ResultSet resultSet = stmt.executeQuery()) {
-                    // Parcourir les résultats et ajouter les numU à la liste
-                    while (resultSet.next()) {
-                        String developerId = resultSet.getString("contenu");
-                        System.out.println("developerId"+developerId);
-                        developerIds.add(developerId);
-                    }
-                    System.out.println("developerIds"+developerIds);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace(); // Ajoutez plus de gestion des erreurs si nécessaire
-                throw new RuntimeException("Erreur lors de la récupération des développeurs", e);
-            }
-
-            // Si la liste est vide, cela signifie qu'il n'y a pas de développeur associé à ce projet
-            if (developerIds.isEmpty()) {
-                System.out.println("Aucun développeur n'est associé à ce projet.");
-            }
-
-            return developerIds;
-        }
-    public boolean getNameProjet(String name) {
-
-        String query = "SELECT nomP FROM Projet";
+        String query = "SELECT contenu " +
+                "FROM Commentaire c " +
+                "JOIN Projet p ON p.numP = c.numP " +
+                "WHERE p.nomP = ?";
 
         try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
 
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-
-                String projet = rs.getString("nomP");
-
-                if (projet.equals(name)) {
-
-                    return false;
-
+            stmt.setString(1, name);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                // Parcourir les résultats et ajouter les numU à la liste
+                while (resultSet.next()) {
+                    String developerId = resultSet.getString("contenu");
+                    System.out.println("developerId"+developerId);
+                    developerIds.add(developerId);
                 }
-
+                System.out.println("developerIds"+developerIds);
             }
-
         } catch (SQLException e) {
-
-            e.printStackTrace();
-
+            e.printStackTrace(); // Ajoutez plus de gestion des erreurs si nécessaire
+            throw new RuntimeException("Erreur lors de la récupération des développeurs", e);
         }
 
-        return true;
+        // Si la liste est vide, cela signifie qu'il n'y a pas de développeur associé à ce projet
+        if (developerIds.isEmpty()) {
+            System.out.println("Aucun développeur n'est associé à ce projet.");
+        }
 
+        return developerIds;
     }
-    /*public boolean changeProgres(String nomP){
 
-        String queryUpdate = "UPDATE Tache SET progres= ? WHERE nomP = ?";
-        if(progres(String numP))
 
-    }*/
+
+
+    public boolean getNameProjet(String name) {
+        String query = "SELECT nomP FROM Projet";
+        try (PreparedStatement stmt = databaseManager.getConnexion().prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String projet = rs.getString("nomP");
+                if (projet.equals(name)) {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 
 }
-
-

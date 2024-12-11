@@ -9,56 +9,31 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+
 import java.util.List;
 import java.util.Map;
 
 @Controller
 public class TacheControleur {
-    private final DatabaseManager databaseManager;
+
     private  final TacheService TacheService;
     private final UserService UserService;
-
     private final ProjectService ProjectService;
 
     public TacheControleur(TacheService TacheService,UserService userService,ProjectService projectService) {
-        UserService = userService;
-        ProjectService = projectService;
-
-        this.databaseManager = new DatabaseManager("jdbc:mysql://sql7.freesqldatabase.com:3306/sql7743283", "sql7743283", "aC2kDrfGsk");
+        this.UserService = userService;
+        this.ProjectService = projectService;
         this.TacheService = TacheService;
     }
+
+
     @GetMapping("/dashboardManager")
     public String showAddProjectForm() {
         return "dashboardManager";
         // nom du template HTML pour ajouter un projet
     }
 
-    /*@PostMapping("/addTask")
-    public String ajouterTache( Tache tache, HttpSession session, Model model){
-      //  String userId = DeveloppeurService.getDeveloperIdByEmail(tache.getDeveloppeur());
-        String projectId= com.example.demo.ProjectService.getProjectIdByName(tache.getProject().getId());
-        System.out.println("I AM HERE");
-        boolean success = TacheService.insererTache( tache.getName(),
-                tache.getDescription(),
-                tache.getDueDate(),
-                tache.getPriority(),
-                tache.getStatus(),
-                projectId, // L'ID du projet associé
-                tache.getDeveloppeur(),                    // L'ID de l'utilisateur connecté
-              ( tache.getTache() != null ? tache.getTache().getId() : null )// Dépendance éventuelle
-        );
-        if (success) {
-            model.addAttribute("message", "Tâche ajoutée avec succès !");
-            System.out.println("sucess");
-            return "dashboardManager"; // Redirige vers une page de succès (ex. success.html)
-        } else {
-            System.out.println("ERRROR");
-            model.addAttribute("error", "Une erreur est survenue.");
-            return "dashboardManager"; // Redirige vers une page d'erreur (ex. error.html)
-        }
-    }
-*///"/projects/{name}
+
 
     @PostMapping("/addTask")
     public String ajouterTache(  @RequestParam("taskName") String taskName,
@@ -69,7 +44,7 @@ public class TacheControleur {
                                  @RequestParam("taskAdmin") String taskAdmin // Récupérer l'ID du développeur
             ,HttpSession session, Model model){
         String userId = UserService.getUserIdByEmail(taskAdmin);
-        String projectId= com.example.demo.ProjectService.getProjectIdByName( taskProjet);
+        String projectId= ProjectService.getProjectIdByName( taskProjet);
 
         System.out.println("Task Name: " + taskName);
 
@@ -94,37 +69,41 @@ public class TacheControleur {
         }
     }
 
+
     @GetMapping("projects/{name}/tasks")
     @ResponseBody
     public List<Map<String, String>> getTasksByProjectName(@PathVariable String name, Model model) {
 
-        String projectId = com.example.demo.ProjectService.getProjectIdByName(name);
+        String projectId =ProjectService.getProjectIdByName(name);
         System.out.println("projetid"+ name);
         model.addAttribute("projectId"+projectId);
-        List<Map<String, String>> tasks= com.example.demo.TacheService. getTacheByProjectName(name);
+        List<Map<String, String>> tasks= TacheService. getTacheByProjectName(name);
+        return tasks;
+    }
 
 
-        return tasks;}
     @PostMapping("/add-dependency")
     public ResponseEntity<String> addDependency(@RequestBody Map<String, String> request) {
-     //  String projectName = request.get("projectName");  // Récupérer le nom du projet
-       String taskName = request.get("taskName");  // Récupérer le nom de la tâche
-       String dependencyName = request.get("dependencyName");  // Récupérer le nom de la dépendance
+        //  String projectName = request.get("projectName");  // Récupérer le nom du projet
+        String taskName = request.get("taskName");  // Récupérer le nom de la tâche
+        String dependencyName = request.get("dependencyName");  // Récupérer le nom de la dépendance
 
-    //   System.out.println("Project: " + projectName);
-       System.out.println("Task: " + taskName);
-       System.out.println("Dependency: " + dependencyName);
-       if (TacheService.verifierache(dependencyName)) {
-          Boolean insereTache= TacheService.inserDependancesTcahe(taskName,dependencyName);
-          if(insereTache) {
-              String tache = TacheService.getTacheid(taskName);
-              System.out.println(tache);
-          }       return ResponseEntity.ok("Dépendance ajoutée avec succès");
+        //   System.out.println("Project: " + projectName);
+        System.out.println("Task: " + taskName);
+        System.out.println("Dependency: " + dependencyName);
+        if (TacheService.verifierache(dependencyName)) {
+            Boolean insereTache= TacheService.inserDependancesTcahe(taskName,dependencyName);
+            if(insereTache) {
+                String tache = TacheService.getTacheid(taskName);
+                System.out.println(tache);
+            }       return ResponseEntity.ok("Dépendance ajoutée avec succès");
 
-   }else {
-           return ResponseEntity.ok("Dépendance  n'existe pas");
-       }
+        }else {
+            return ResponseEntity.ok("Dépendance  n'existe pas");
+        }
     }
+
+
     // Endpoint pour récupérer les tâches dépendantes d'une tâche donnée
     // Endpoint pour récupérer les dépendances d'une tâche
     @GetMapping("/tasks/{taskName}")
@@ -136,11 +115,14 @@ public class TacheControleur {
         System.out.println("Dépendances: " + dependencies);
         return dependencies; // Automatiquement converti en JSON
     }
+
+
     @PostMapping("/updateTaskStatus")
     public String updateTaskStatus(@RequestParam("taskName") String taskId,
                                    @RequestParam("status") String status,
+
                                    RedirectAttributes redirectAttributes) {
-        // Appeler la méthode ModifierStatut pour vérifier et modifier le statut
+        // Appeler la méthode verifierEtModifierStatut pour vérifier et modifier le statut
         boolean statutModifie = TacheService.ModifierStatut(taskId, status);
 
         if (statutModifie) {
@@ -154,7 +136,4 @@ public class TacheControleur {
         // Rediriger vers le tableau de bord pour rafraîchir la page
         return "dashboarduser";
     }
-
-
-
 }

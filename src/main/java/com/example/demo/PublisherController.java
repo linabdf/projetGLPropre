@@ -5,14 +5,21 @@ import java.util.List;
 
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 @Controller
-public class Publisher {
+public class PublisherController {
+
     @Autowired
     private CommentaireService commentaireService;
+    private final ProjectService ProjectService;
+
+
+    public PublisherController(ProjectService ProjectService) {
+        this.ProjectService = ProjectService;
+
+    }
+
 
     @GetMapping("/projet/{projectName}")
     @ResponseBody
@@ -20,7 +27,7 @@ public class Publisher {
         // Récupérer les commentaires pour le projet
         System.out.println("Appel de la méthode getCommentaireProjectid pour le projet : " + projectName);
 
-        List<String> commentaires = ProjectService.getCommentaireProjectid(projectName);
+        List<String> commentaires =  ProjectService.getCommentaireProjectid(projectName);
         // Vérifiez si la liste est null ou vide
         if (commentaires == null) {
             System.out.println("La liste des commentaires est null");
@@ -29,7 +36,7 @@ public class Publisher {
         } else {
             System.out.println("Commentaires récupérés : " + commentaires); // Affiche la liste des commentaires
         }
-         System.out.println("commm"+commentaires);
+        System.out.println("commm"+commentaires);
         // Ajouter les commentaires au modèle pour les afficher dans la vue
         model.addAttribute("commentaires", commentaires);
         model.addAttribute("projectName", projectName);

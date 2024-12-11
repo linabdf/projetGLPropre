@@ -3,18 +3,13 @@ package com.example.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Service;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+
 
 import javax.sql.DataSource;
 
-import static io.netty.handler.codec.http.HttpHeaders.setDate;
+
 @Configuration
 public class DatabaseManager {
 
@@ -22,17 +17,19 @@ public class DatabaseManager {
     private String username;
     private String password;
 
-    public static Connection connection;
+    private static Connection connection;
 
     public DatabaseManager(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
     }
+
+
     public DatabaseManager() {
-
-
     }
+
+
     @Autowired
     private DataSource dataSource;  // Injecte la DataSource automatiquement par Spring
 
@@ -40,15 +37,18 @@ public class DatabaseManager {
         return dataSource.getConnection();  // Obtenir la connexion via DataSource
     }
 
+
     public void closeConnection(Connection connection) throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
+
     public Connection getConnexion() {
         return connection;
     }
+
 
     public void connexion() {
         if (!isOnline()) {
@@ -76,7 +76,8 @@ public class DatabaseManager {
         }
     }
 
-    public static boolean isOnline() {
+
+    public boolean isOnline() {
         try {
             if ((connection == null) || (connection.isClosed())) {
                 return false;
@@ -86,4 +87,6 @@ public class DatabaseManager {
             System.out.println("[DataBaseManager] Erreur lors de la verification de l'etat de la base");
         }
         return false;
-    }}
+    }
+
+}

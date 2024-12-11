@@ -1,15 +1,14 @@
 package com.example.demo;
-//model
-import jakarta.persistence.Table;
 
+import jakarta.persistence.Table;
 import jakarta.persistence.*;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 
 
 @Entity
 @Table(name ="utilisateur")
-class User {
+public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private String id;
@@ -21,36 +20,76 @@ class User {
     private String password;
     @Column(name="role")
     private String userType;
+
+
     public User() {
 
     }
+
+
     public User(String id) {
         this.id=id;
     }
+
+
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
-       // Ajout de userType dans ce constructeur
+
     }
+
+
+
+
 
     // Getters et setters
     public String getUserId() {
         return id;
     }
+
+
     public void setUserId(String id ) {
         this.id= id;
     }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getName() {
+        return name;
+    }
 
-    public String getUserType() { return userType; }
-    public void setUserType(String userType) { this.userType = userType; }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    public String getUserType() {
+        return userType;
+    }
+
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
 
 }
