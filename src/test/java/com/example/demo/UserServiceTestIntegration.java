@@ -32,11 +32,11 @@ public class UserServiceTestIntegration {
         // Test de la méthode getUser
         databasemanager.connexion();
 
-        userservice.insererutilisateur("Jonathan Gayraud", "Gayraudjonathan467@gmail.com", "1234", "manager");
-        String role = userservice.getUserRole("Gayraudjonathan467@gmail.com", "1234");
+        userservice.insererutilisateur("Jonathan Gayraud", "Gayudjonathan467@gmail.com", "1234", "manager");
+        String role = userservice.getUserRole("Gayudjonathan467@gmail.com", "1234");
         assertEquals("manager", role, "Le rôle de l'utilisateur doit être 'manager'.");
 
-        String role2 = userservice.getUserRole("Gayraudjonathan467@gmail.com", "1234");
+        String role2 = userservice.getUserRole("Gayudjonathan467@gmail.com", "1234");
         assertNotEquals("admin", role2, "Le rôle de l'utilisateur ne doit pas être 'admin'.");
 
     }
@@ -137,5 +137,31 @@ public class UserServiceTestIntegration {
 
         String result3 = userservice.getDeveloppeurIdByEmail("Gayraudjonathan47@gmail.com");
         assertNull(result3, "Le résultat doit être nul pour un utilisateur qui n'est pas un developpeur");
+    }
+    @Test
+    public void testModifierRole() throws SQLException {
+        // Préparer la connexion à la base de données
+        databasemanager.connexion();
+
+        // Insérer un utilisateur pour tester
+        userservice.insererutilisateur("Jonathan Gayraud", "Gayraudjonathan467@gmail.com", "1234", "manager");
+
+        // Vérifier le rôle initial
+        String initialRole = userservice.getUserRole("Gayraudjonathan467@gmail.com", "1234");
+        assertEquals("manager", initialRole, "Le rôle initial doit être 'manager'.");
+
+        // Modifier le rôle
+        boolean result = userservice.modifierRole("Gayraudjonathan467@gmail.com", "admin");
+
+        // Vérifier si la mise à jour a été effectuée avec succès
+        assertTrue(result, "Le rôle doit être modifié avec succès.");
+
+        // Vérifier si le rôle a été effectivement mis à jour dans la base de données
+        String updatedRole = userservice.getUserRole("Gayraudjonathan467@gmail.com", "1234");
+        assertEquals("admin", updatedRole, "Le rôle modifié doit être 'admin'.");
+
+        // Tenter de modifier le rôle d'un utilisateur qui n'existe pas
+        boolean result2 = userservice.modifierRole("inexistente@example.com", "admin");
+        assertFalse(result2, "Le rôle ne doit pas être modifié pour un utilisateur inexistant.");
     }
 }

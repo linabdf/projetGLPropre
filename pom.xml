@@ -70,15 +70,21 @@
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.7.0</version> <!-- Utiliser la version JUnit 5 la plus récente -->
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.0</version> <!-- Utilisez une version récente et stable -->
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.7.0</version> <!-- Version de l'engine JUnit 5 -->
+			<version>5.10.0</version> <!-- Version de l'engine JUnit 5 -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -90,23 +96,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+
 		</dependency>
 
 		<!-- JUnit 5 (JUnit Jupiter) pour les tests -->
 
 		<!-- JUnit 5 (JUnit Jupiter) pour les tests -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
 
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-
-			<scope>test</scope>
-		</dependency>
 
 	</dependencies>
 
@@ -117,7 +113,21 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<printSummary>true</printSummary> <!-- Affiche un résumé des tests dans la console -->
+					<forkCount>1</forkCount> <!-- Utilise un seul processus JVM pour exécuter les tests -->
+					<reuseForks>false</reuseForks> <!-- Ne réutilise pas les forks entre tests -->
+					<includes>
+						<include>**/*.java</include>
+					</includes>
+				</configuration>
+			</plugin>
 		</plugins>
+
 	</build>
 
 

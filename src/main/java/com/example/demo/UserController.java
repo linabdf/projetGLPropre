@@ -185,7 +185,22 @@ public class UserController {
         }
 
     }
+    @PostMapping("/updateRole")
+    public String updateRole(@RequestParam("email") String email,
+                             @RequestParam("role") String role,
+                             Model model) {
+        // Appeler le service pour mettre à jour le rôle
+        boolean success = UserService.modifierRole(email, role);
 
+        // Vérifier si la mise à jour a réussi
+        if (success) {
+            model.addAttribute("successMessage", "Le rôle a été mis à jour avec succès.");
+        } else {
+            model.addAttribute("errorMessageUpdate", "Erreur : Utilisateur non trouvé ou problème lors de la mise à jour.");
+        }
+
+        return "dashboardAdmin"; // Retourner à la vue du formulaire
+    }
 
     @GetMapping("/logout")
     public String deconnexion(HttpServletRequest request) {

@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 
 @Service
@@ -282,6 +279,68 @@ public class UserService {
             return false;
         }
     }
+    public boolean modifierRole(String mail, String nouveauRole) {
+        Connection connection = databaseManager.getConnexion();
+
+        try {
+            // Vérifier le rôle actuel de l'utilisateur
+            String selectRoleQuery = "SELECT role FROM Utilisateur WHERE mail = ?";
+            String currentRole = "";
+
+            try (PreparedStatement stmtSelect = connection.prepareStatement(selectRoleQuery)) {
+                stmtSelect.setString(1, mail);
+                ResultSet rs = stmtSelect.executeQuery();
+
+                if (rs.next()) {
+                    currentRole = rs.getString("role");
+                    System.out.println("ROLE"+currentRole);
+                } else {
+                    System.out.println("Utilisateur non trouvé avec l'email : " + mail);
+                    return false;  // Si l'utilisateur n'existe pas
+                }
+            }
+
+            // Si l'utilisateur a le rôle "user" et qu'on veut le promouvoir en "manager"
+            if ("user".equals(currentRole) && "manager".equals(nouveauRole)) {
+                // 1. Supprimer de la table "user"
+                String deleteFromUserQuery = "DELETE FROM developpeur WHERE numU = (SELECT numU FROM Utilisateur WHERE mail = ?)";
+                try (PreparedStatement stmtDelete = connection.prepareStatement(deleteFromUserQuery)) {
+                    stmtDelete.setString(1, mail);
+                    stmtDelete.executeUpdate();
+                    System.out.println("Utilisateur supprimé de la table user.");
+                }
+
+                // 2. Ajouter à la table "manager"
+                String insertIntoManagerQuery = "INSERT INTO chef_Projet (numU) SELECT numU FROM Utilisateur WHERE mail = ?";
+                try (PreparedStatement stmtInsert = connection.prepareStatement(insertIntoManagerQuery)) {
+                    stmtInsert.setString(1, mail);
+                    stmtInsert.executeUpdate();
+                    System.out.println("Utilisateur ajouté à la table manager.");
+                }
+            }
+
+            // 3. Mettre à jour le rôle dans la table Utilisateur
+            String updateRoleQuery = "UPDATE Utilisateur SET role = ? WHERE mail = ?";
+            try (PreparedStatement stmtUpdate = connection.prepareStatement(updateRoleQuery)) {
+                stmtUpdate.setString(1, nouveauRole);
+                stmtUpdate.setString(2, mail);
+                int rowsUpdated = stmtUpdate.executeUpdate();
+
+                if (rowsUpdated > 0) {
+                    System.out.println("Rôle mis à jour avec succès !");
+                    return true;
+                } else {
+                    System.out.println("Aucun utilisateur trouvé avec cet email.");
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 
 
