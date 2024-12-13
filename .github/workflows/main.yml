@@ -33,3 +33,7 @@ jobs:
    # Étape 4: Exécuter les tests avec Maven
       - name: Run tests with Maven
         run: mvn test  # Exécuter les tests après la compilation
+     # Étape 5: Deploy to server
+      - name: Deploy to server
+        run: |
+          docker run -d -p 8091:8080 demo
